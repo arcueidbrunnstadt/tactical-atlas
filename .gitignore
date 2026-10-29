@@ -44,3 +44,11 @@ yarn-error.log*
 
 # OS metadata
 .DS_Store
+
+# Independent-host runtime state and private cutover files
+/data/
+/private/
+/deploy/.env
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

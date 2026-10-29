@@ -1,5 +1,7 @@
 # Hosting your own copy
 
+For the Node/SQLite branch, use [the independent-host guide](INDEPENDENT_HOST.md). The Sites instructions below describe the original Cloudflare deployment path.
+
 The repository is a clean source snapshot. It does not contain the production Site identity, database, account keys, private feedback or the research workspace's Git history.
 
 Local browsing, criteria editing and comparison work without a key; see the README. To host an AI-enabled copy, provision your own Sites project and D1 binding, apply the committed migrations, and configure the server secrets documented in `.env.example`. Register your own project identity rather than copying the production deployment's settings. Hosting and provider billing belong to the operator of that copy.

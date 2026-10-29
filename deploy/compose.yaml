@@ -1,0 +1,41 @@
+name: tactical-atlas
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      DATABASE_PATH: /data/atlas.sqlite
+      APP_ORIGIN: https://${SITE_DOMAIN:?Set SITE_DOMAIN in deploy/.env}
+      AI_ENABLED: ${AI_ENABLED:-false}
+      AI_PROVIDER: deepseek
+      AI_MODEL: deepseek-flash
+      AI_BILLING_CURRENCY: ${AI_BILLING_CURRENCY:-CNY}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      AI_THROTTLE_SECRET: ${AI_THROTTLE_SECRET:?Set a private random AI_THROTTLE_SECRET}
+      AI_CLIENT_IDENTITY_MODE: browser-session
+    volumes:
+      - atlas_data:/data
+    expose:
+      - "3000"
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?Set SITE_DOMAIN in deploy/.env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+volumes:
+  atlas_data:
+  caddy_data:
+  caddy_config:
