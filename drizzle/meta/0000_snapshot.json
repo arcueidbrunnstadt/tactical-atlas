@@ -1,0 +1,193 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "76439ce4-86d1-45f8-9273-a59e2e5f2acd",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "ai_call_reservations": {
+      "name": "ai_call_reservations",
+      "columns": {
+        "request_id": {
+          "name": "request_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_nonce": {
+          "name": "owner_nonce",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "day_key": {
+          "name": "day_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reserved_cents": {
+          "name": "reserved_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "denial_reason": {
+          "name": "denial_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "config_version": {
+          "name": "config_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'trial-v1'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ai_call_reservations_day_key_ai_daily_usage_day_key_fk": {
+          "name": "ai_call_reservations_day_key_ai_daily_usage_day_key_fk",
+          "tableFrom": "ai_call_reservations",
+          "tableTo": "ai_daily_usage",
+          "columnsFrom": [
+            "day_key"
+          ],
+          "columnsTo": [
+            "day_key"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_reservation_valid_state": {
+          "name": "ai_reservation_valid_state",
+          "value": "\"ai_call_reservations\".\"state\" IN ('pending', 'reserved', 'denied')"
+        },
+        "ai_reservation_charge_within_unit": {
+          "name": "ai_reservation_charge_within_unit",
+          "value": "\"ai_call_reservations\".\"reserved_cents\" BETWEEN 0 AND 1"
+        }
+      }
+    },
+    "ai_daily_usage": {
+      "name": "ai_daily_usage",
+      "columns": {
+        "day_key": {
+          "name": "day_key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "call_limit": {
+          "name": "call_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 100
+        },
+        "reserved_calls": {
+          "name": "reserved_calls",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_daily_limit_within_ceiling": {
+          "name": "ai_daily_limit_within_ceiling",
+          "value": "\"ai_daily_usage\".\"call_limit\" BETWEEN 0 AND 100"
+        },
+        "ai_daily_reserved_within_limit": {
+          "name": "ai_daily_reserved_within_limit",
+          "value": "\"ai_daily_usage\".\"reserved_calls\" BETWEEN 0 AND \"ai_daily_usage\".\"call_limit\""
+        }
+      }
+    },
+    "ai_trial_budget": {
+      "name": "ai_trial_budget",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "limit_cents": {
+          "name": "limit_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1000
+        },
+        "reserved_cents": {
+          "name": "reserved_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_trial_limit_within_approval": {
+          "name": "ai_trial_limit_within_approval",
+          "value": "\"ai_trial_budget\".\"limit_cents\" BETWEEN 0 AND 1000"
+        },
+        "ai_trial_reserved_within_limit": {
+          "name": "ai_trial_reserved_within_limit",
+          "value": "\"ai_trial_budget\".\"reserved_cents\" BETWEEN 0 AND \"ai_trial_budget\".\"limit_cents\""
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

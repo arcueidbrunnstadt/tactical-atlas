@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1793222648318,
+      "tag": "0000_ai_quota",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793268540500,
+      "tag": "0001_ai_client_throttle",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793275658625,
+      "tag": "0002_deepseek_reservation_unit",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1793289536040,
+      "tag": "0003_public_feedback",
+      "breakpoints": true
+    }
+  ]
+}

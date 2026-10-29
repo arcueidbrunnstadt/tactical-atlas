@@ -1,0 +1,303 @@
+[
+  {
+    "id": "steam_637090",
+    "title": "BATTLETECH",
+    "aliases": ["BattleTech", "MechWarrior BATTLETECH"],
+    "storeUrl": "https://store.steampowered.com/app/637090/",
+    "editionScope": "Base Steam game; expansion-specific features are not assumed.",
+    "summary": "Command a mech squad while maintaining a mercenary company through an interstellar civil-war campaign.",
+    "facets": {
+      "setting": {"value": "scifi", "status": "source_supported", "evidenceIds": ["BT-world"]},
+      "structure": {"value": ["squad", "company"], "status": "source_supported", "evidenceIds": ["BT-company", "BT-combat"]},
+      "campaign": {"value": "mission", "status": "source_supported", "evidenceIds": ["BT-company"]},
+      "progression": {"value": "equipment", "status": "source_supported", "evidenceIds": ["BT-company"]},
+      "positioning": {"value": true, "status": "source_supported", "evidenceIds": ["BT-combat"]},
+      "combos": {"value": null, "status": "unknown", "evidenceIds": []},
+      "narrative": {"value": true, "status": "source_supported", "evidenceIds": ["BT-world"]},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Loadout decisions connect battlefield positioning with repair and company-management choices.", "evidenceIds": ["BT-company", "BT-combat"]}],
+    "tradeoffs": [{"text": "Company upkeep and equipment maintenance add decisions beyond individual battles; overall balance is unassessed.", "evidenceIds": ["BT-company"]}],
+    "evidence": [
+      {"id": "BT-world", "statement": "The publisher describes futuristic mech warfare and a civil-war story.", "basis": "source_report", "url": "https://store.steampowered.com/app/637090/", "locator": "About This Game; Take Part in a Desperate Civil War", "checkedDate": "2026-10-29", "limitations": ["Developer description; not a firsthand gameplay test."]},
+      {"id": "BT-company", "statement": "The description covers contracts, pilot development, company upkeep and mech equipment changes.", "basis": "source_report", "url": "https://store.steampowered.com/app/637090/", "locator": "Manage Your Mercenary Company; Customize Your Mechs", "checkedDate": "2026-10-29", "limitations": ["No current-build save, offline or economy behavior was tested."]},
+      {"id": "BT-combat", "statement": "The combat description explicitly names squad deployment, terrain, positioning, weapons and abilities.", "basis": "source_report", "url": "https://store.steampowered.com/app/637090/", "locator": "Command a Squad of Mechs in Turn-Based Combat", "checkedDate": "2026-10-29", "limitations": ["Does not establish a global tactical-depth or authenticity rating."]}
+    ]
+  },
+  {
+    "id": "steam_1043810",
+    "title": "Tactical Breach Wizards",
+    "aliases": ["TBW"],
+    "storeUrl": "https://store.steampowered.com/app/1043810/",
+    "editionScope": "Base Steam campaign; Special Edition extras are excluded from matching.",
+    "summary": "Guide a team of modern-day wizards through authored tactical encounters, combining character-specific powers and revising plans.",
+    "facets": {
+      "setting": {"value": ["fantasy", "contemporary"], "status": "source_supported", "evidenceIds": ["TBW-team"]},
+      "structure": {"value": "squad", "status": "source_supported", "evidenceIds": ["TBW-team"]},
+      "campaign": {"value": ["compact", "mission"], "status": "provisional", "evidenceIds": ["TBW-format"]},
+      "progression": {"value": "unique_characters", "status": "source_supported", "evidenceIds": ["TBW-powers"]},
+      "positioning": {"value": true, "status": "provisional", "evidenceIds": ["TBW-powers"]},
+      "combos": {"value": true, "status": "source_supported", "evidenceIds": ["TBW-powers"]},
+      "narrative": {"value": true, "status": "source_supported", "evidenceIds": ["TBW-team"]},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Distinctive wizard abilities and upgrade perks offer a concrete basis for exploring ability synergies.", "evidenceIds": ["TBW-powers"]}],
+    "tradeoffs": [{"text": "The developer describes an authored story rather than a branching plot or base-building campaign. Compact is a provisional format label, not a stopping-time guarantee.", "evidenceIds": ["TBW-format"]}],
+    "evidence": [
+      {"id": "TBW-team", "statement": "The developer presents a wizard team uncovering a modern conspiracy in a story-led campaign.", "basis": "source_report", "url": "https://store.steampowered.com/app/1043810/", "locator": "About This Game opening; Get to Know These Loveable Idiots", "checkedDate": "2026-10-29", "limitations": ["Fantasy/contemporary describes the fictional setting, not realistic authenticity."]},
+      {"id": "TBW-powers", "statement": "The description advertises spell combinations, character-specific abilities, perk upgrades, knockback and rewinds.", "basis": "source_report", "url": "https://store.steampowered.com/app/1043810/", "locator": "Combo Spells; Experiment Freely; Upgrade Your Magical Arsenal", "checkedDate": "2026-10-29", "limitations": ["Positioning relevance is an interpretation of the described knockback; balance remains unassessed."]},
+      {"id": "TBW-format", "statement": "We classify its handcrafted encounters and described shorter story campaign as a compact mission format.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1043810/", "locator": "About This Game opening; What Is It Not?", "checkedDate": "2026-10-29", "limitations": ["Format classification is provisional; no session length or working demo access is established."]}
+    ]
+  },
+  {
+    "id": "steam_268500",
+    "title": "XCOM 2",
+    "aliases": ["XCOM® 2"],
+    "storeUrl": "https://store.steampowered.com/app/268500/",
+    "editionScope": "Base Steam game; War of the Chosen and other DLC are separate offerings.",
+    "summary": "Lead a resistance squad through missions while developing soldiers, researching equipment and managing a mobile headquarters.",
+    "facets": {
+      "setting": {"value": "scifi", "status": "source_supported", "evidenceIds": ["XCOM-campaign"]},
+      "structure": {"value": "squad", "status": "source_supported", "evidenceIds": ["XCOM-campaign"]},
+      "campaign": {"value": "mission", "status": "source_supported", "evidenceIds": ["XCOM-campaign"]},
+      "progression": {"value": ["class_based", "equipment"], "status": "source_supported", "evidenceIds": ["XCOM-development"]},
+      "positioning": {"value": true, "status": "provisional", "evidenceIds": ["XCOM-tactics"]},
+      "combos": {"value": null, "status": "unknown", "evidenceIds": []},
+      "narrative": {"value": null, "status": "unknown", "evidenceIds": []},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Soldier skill trees and research-driven weapon choices support a class-and-equipment development preference.", "evidenceIds": ["XCOM-development"]}],
+    "tradeoffs": [{"text": "Headquarters and research management extend the experience beyond encounter tactics; DLC-specific changes are not included here.", "evidenceIds": ["XCOM-development"]}],
+    "evidence": [
+      {"id": "XCOM-campaign", "statement": "The store describes a squad-based resistance against alien rule, with missions and a mobile headquarters.", "basis": "source_report", "url": "https://store.steampowered.com/app/268500/", "locator": "About This Game; XCOM on the Run; Each Mission Is a Unique Challenge", "checkedDate": "2026-10-29", "limitations": ["The campaign description is not a historical-authenticity claim."]},
+      {"id": "XCOM-development", "statement": "The base-game description names soldier classes, skill trees, headquarters rooms, research and equipment upgrades.", "basis": "source_report", "url": "https://store.steampowered.com/app/268500/", "locator": "Recruit Resistance Fighters; Research, Develop and Upgrade", "checkedDate": "2026-10-29", "limitations": ["Overall build viability and mechanical balance were not evaluated."]},
+      {"id": "XCOM-tactics", "statement": "Concealment, ambushes and extraction objectives suggest a positioning-oriented tactical profile.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/268500/", "locator": "Tactical Guerrilla Combat", "checkedDate": "2026-10-29", "limitations": ["Interpretation of the developer description, not a comparative combat test."]}
+    ]
+  },
+  {
+    "id": "steam_590380",
+    "title": "Into the Breach",
+    "aliases": ["ITB"],
+    "storeUrl": "https://store.steampowered.com/app/590380/",
+    "editionScope": "Current Steam offering, including its advertised free Advanced Edition update.",
+    "summary": "Control future mechs against an alien threat, using advance attack information to protect civilian buildings across repeatable attempts.",
+    "facets": {
+      "setting": {"value": "scifi", "status": "source_supported", "evidenceIds": ["ITB-world"]},
+      "structure": {"value": "squad", "status": "source_supported", "evidenceIds": ["ITB-world"]},
+      "campaign": {"value": "compact", "status": "provisional", "evidenceIds": ["ITB-format"]},
+      "progression": {"value": "equipment", "status": "source_supported", "evidenceIds": ["ITB-upgrades"]},
+      "positioning": {"value": true, "status": "provisional", "evidenceIds": ["ITB-format"]},
+      "combos": {"value": null, "status": "unknown", "evidenceIds": []},
+      "narrative": {"value": null, "status": "unknown", "evidenceIds": []},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Telegraphed attacks and civilian protection offer a specific planning emphasis; that does not mean every system is nonrandom.", "evidenceIds": ["ITB-format", "ITB-world"]}],
+    "tradeoffs": [{"text": "Each attempt has a generated challenge. Compact is a format interpretation, not a measured guarantee of short sessions.", "evidenceIds": ["ITB-world", "ITB-format"]}],
+    "evidence": [
+      {"id": "ITB-world", "statement": "The developer describes future mech squads confronting aliens through newly generated attempts.", "basis": "source_report", "url": "https://store.steampowered.com/app/590380/", "locator": "About This Game; Advanced Edition; introductory description", "checkedDate": "2026-10-29", "limitations": ["Generated challenges preclude interpreting telegraphed attacks as no randomness anywhere."]},
+      {"id": "ITB-format", "statement": "We infer a compact, positioning-focused format from the described minimal combat, telegraphed attacks and building protection.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/590380/", "locator": "Key Features: Defend the Cities; Perfect Your Strategy", "checkedDate": "2026-10-29", "limitations": ["No battle/session timing or direct positioning comparison was measured."]},
+      {"id": "ITB-upgrades", "statement": "The developer describes finding weapons and pilots while moving between islands.", "basis": "source_report", "url": "https://store.steampowered.com/app/590380/", "locator": "Key Features: Build the Ultimate Mech", "checkedDate": "2026-10-29", "limitations": ["Does not establish character-build depth or balance."]}
+    ]
+  },
+  {
+    "id": "steam_1084160",
+    "title": "Jagged Alliance 3",
+    "aliases": ["JA3", "Jagged Alliance III"],
+    "storeUrl": "https://store.steampowered.com/app/1084160/",
+    "editionScope": "Base Steam offering; no unstated mod features included.",
+    "summary": "Recruit mercenaries, develop their perks and equipment, and make campaign decisions in the fictional country of Grand Chien.",
+    "facets": {
+      "setting": {"value": "contemporary", "status": "provisional", "evidenceIds": ["JA-setting"]},
+      "structure": {"value": "squad", "status": "source_supported", "evidenceIds": ["JA-campaign"]},
+      "campaign": {"value": "open", "status": "source_supported", "evidenceIds": ["JA-campaign"]},
+      "progression": {"value": ["equipment", "unique_characters"], "status": "source_supported", "evidenceIds": ["JA-development"]},
+      "positioning": {"value": null, "status": "unknown", "evidenceIds": []},
+      "combos": {"value": null, "status": "unknown", "evidenceIds": []},
+      "narrative": {"value": true, "status": "source_supported", "evidenceIds": ["JA-campaign"]},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Mercenary-specific perks, weapon customization and campaign control connect character development with operational choices.", "evidenceIds": ["JA-development", "JA-campaign"]}],
+    "tradeoffs": [{"text": "A military-fiction setting does not establish realistic simulation or historical authenticity; those remain unassessed.", "evidenceIds": ["JA-setting"]}],
+    "evidence": [
+      {"id": "JA-setting", "statement": "We classify the fictional president, paramilitary conflict and weapon-based mercenary setting as contemporary military fiction.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1084160/", "locator": "About This Game opening; Features", "checkedDate": "2026-10-29", "limitations": ["Contemporary is a broad catalogue classification, not a claim about a specific year or authenticity."]},
+      {"id": "JA-campaign", "statement": "The developer describes mercenary recruitment, an open RPG campaign, territory control and choices affecting the country.", "basis": "source_report", "url": "https://store.steampowered.com/app/1084160/", "locator": "About This Game; Features: open RPG structure; control territory", "checkedDate": "2026-10-29", "limitations": ["Campaign choices are described, not comparatively tested."]},
+      {"id": "JA-development", "statement": "The feature list describes distinctive mercenaries, level-up perks and weapon/equipment customization.", "basis": "source_report", "url": "https://store.steampowered.com/app/1084160/", "locator": "Features: recruit mercenaries; loot/salvage/customize; choose perks", "checkedDate": "2026-10-29", "limitations": ["Build strength and balance remain unassessed."]}
+    ]
+  },
+  {
+    "id": "steam_365360",
+    "title": "Battle Brothers",
+    "aliases": ["BattleBrothers"],
+    "storeUrl": "https://store.steampowered.com/app/365360/",
+    "editionScope": "Base game description; DLC-specific origins and features are not assumed.",
+    "summary": "Manage a mercenary company in a generated medieval-fantasy world, choosing contracts, recruits, equipment and training.",
+    "facets": {
+      "setting": {"value": "fantasy", "status": "source_supported", "evidenceIds": ["BB-world"]},
+      "structure": {"value": "company", "status": "source_supported", "evidenceIds": ["BB-world"]},
+      "campaign": {"value": "open", "status": "source_supported", "evidenceIds": ["BB-world"]},
+      "progression": {"value": ["equipment", "skill_based"], "status": "source_supported", "evidenceIds": ["BB-development"]},
+      "positioning": {"value": true, "status": "source_supported", "evidenceIds": ["BB-combat"]},
+      "combos": {"value": true, "status": "source_supported", "evidenceIds": ["BB-combat"]},
+      "narrative": {"value": null, "status": "unknown", "evidenceIds": []},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Classless training, perks and equipment offer a development contrast to fixed class trees.", "evidenceIds": ["BB-development"]}],
+    "tradeoffs": [{"text": "Contracts, wages, rations and injuries make company survival part of the appeal; no general balance rating is assigned.", "evidenceIds": ["BB-world", "BB-combat"]}],
+    "evidence": [
+      {"id": "BB-world", "statement": "The store describes a medieval-fantasy mercenary company, a generated open world and player-chosen contracts.", "basis": "source_report", "url": "https://store.steampowered.com/app/365360/", "locator": "Short description; About This Game opening; world exploration and contracts", "checkedDate": "2026-10-29", "limitations": ["Medieval inspiration is not a historical-authenticity guarantee."]},
+      {"id": "BB-combat", "statement": "The developer describes terrain and height, formation/equipment interactions, fatigue, morale and injuries.", "basis": "source_report", "url": "https://store.steampowered.com/app/365360/", "locator": "About This Game: battlefields; equipment; fatigue; injuries; wages and rations", "checkedDate": "2026-10-29", "limitations": ["No particular strategy's effectiveness was measured."]},
+      {"id": "BB-development", "statement": "The description explicitly replaces fixed classes with individual attributes, backgrounds, traits and perk-based development.", "basis": "source_report", "url": "https://store.steampowered.com/app/365360/", "locator": "About This Game: company fighters; class-based system paragraph", "checkedDate": "2026-10-29", "limitations": ["Character differentiation does not establish universal build viability."]}
+    ]
+  },
+  {
+    "id": "steam_1527950",
+    "title": "Wartales",
+    "aliases": ["War Tales"],
+    "storeUrl": "https://store.steampowered.com/app/1527950/",
+    "editionScope": "Base Steam game; expansion regions and paid contracts are not assumed.",
+    "summary": "Explore a medieval world with a mercenary group, taking contracts and developing companions, equipment and camp facilities.",
+    "facets": {
+      "setting": {"value": "fantasy", "status": "provisional", "evidenceIds": ["WT-setting"]},
+      "structure": {"value": "company", "status": "source_supported", "evidenceIds": ["WT-company"]},
+      "campaign": {"value": "open", "status": "source_supported", "evidenceIds": ["WT-world"]},
+      "progression": {"value": "equipment", "status": "source_supported", "evidenceIds": ["WT-company"]},
+      "positioning": {"value": null, "status": "unknown", "evidenceIds": []},
+      "combos": {"value": true, "status": "provisional", "evidenceIds": ["WT-tactics"]},
+      "narrative": {"value": null, "status": "unknown", "evidenceIds": []},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Recruitment, crafting and camp development make group management a useful comparison point.", "evidenceIds": ["WT-company"]}],
+    "tradeoffs": [{"text": "This profile emphasizes open exploration and mercenary survival. Fantasy is a provisional fictional-medieval classification, not a promise of magic-heavy play.", "evidenceIds": ["WT-world", "WT-setting", "WT-company"]}],
+    "evidence": [
+      {"id": "WT-world", "statement": "The developer describes an open medieval world after the collapse of the fictional Edoran Empire.", "basis": "source_report", "url": "https://store.steampowered.com/app/1527950/", "locator": "About This Game opening; Journey Through a Vast, Open World", "checkedDate": "2026-10-29", "limitations": ["This is the developer's description, not a firsthand world exploration test."]},
+      {"id": "WT-setting", "statement": "We provisionally group this fictional medieval setting under fantasy.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1527950/", "locator": "About This Game opening", "checkedDate": "2026-10-29", "limitations": ["Does not establish magic content or historical fidelity."]},
+      {"id": "WT-company", "statement": "The store describes mercenary recruitment, skill/equipment customization, crafting, camp development and contracts.", "basis": "source_report", "url": "https://store.steampowered.com/app/1527950/", "locator": "About This Game: lead a group; customize your group; collect bounties", "checkedDate": "2026-10-29", "limitations": ["Expansion-specific features are excluded."]},
+      {"id": "WT-tactics", "statement": "We infer combination-focused relevance from the description's emphasis on coordinating characters, equipment and tactics.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1527950/", "locator": "About This Game: tactical turn-based combat paragraph", "checkedDate": "2026-10-29", "limitations": ["Specific combat synergies and balance were not tested."]}
+    ]
+  },
+  {
+    "id": "steam_699170",
+    "title": "Fell Seal: Arbiter's Mark",
+    "aliases": ["Fell Seal", "Fell Seal Arbiters Mark"],
+    "storeUrl": "https://store.steampowered.com/app/699170/",
+    "editionScope": "Base game; Missions and Monsters expansion-specific content is not assumed.",
+    "summary": "A fantasy tactical RPG with authored story encounters, terrain elevation and character customization through classes, subclasses and passives.",
+    "facets": {
+      "setting": {"value": "fantasy", "status": "source_supported", "evidenceIds": ["FS-story"]},
+      "structure": {"value": "squad", "status": "source_supported", "evidenceIds": ["FS-story"]},
+      "campaign": {"value": "mission", "status": "source_supported", "evidenceIds": ["FS-story"]},
+      "progression": {"value": ["class_based", "equipment"], "status": "source_supported", "evidenceIds": ["FS-builds"]},
+      "positioning": {"value": true, "status": "source_supported", "evidenceIds": ["FS-terrain"]},
+      "combos": {"value": null, "status": "unknown", "evidenceIds": []},
+      "narrative": {"value": true, "status": "source_supported", "evidenceIds": ["FS-story"]},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Classes, subclasses, passives and equipment provide explicit levers for customizing a character's role.", "evidenceIds": ["FS-builds"]}],
+    "tradeoffs": [{"text": "The described campaign follows authored story encounters; counts of classes or abilities alone do not establish build depth or balance.", "evidenceIds": ["FS-story", "FS-builds"]}],
+    "evidence": [
+      {"id": "FS-story", "statement": "The developer describes a story-led fantasy/steampunk tactical RPG with a group of Arbiters and handcrafted encounters.", "basis": "source_report", "url": "https://store.steampowered.com/app/699170/", "locator": "Short description; About This Game opening and first bullet", "checkedDate": "2026-10-29", "limitations": ["Story quality was not independently assessed."]},
+      {"id": "FS-builds", "statement": "The description covers classes, subclasses, passive selections and purchased, looted or crafted equipment.", "basis": "source_report", "url": "https://store.steampowered.com/app/699170/", "locator": "About This Game: class system; equipment bullets", "checkedDate": "2026-10-29", "limitations": ["No comparative character builds were tested."]},
+      {"id": "FS-terrain", "statement": "The developer specifically describes tactical battles using uneven terrain and elevation.", "basis": "source_report", "url": "https://store.steampowered.com/app/699170/", "locator": "About This Game: classic tactical combat bullet", "checkedDate": "2026-10-29", "limitations": ["Encounter balance remains unassessed."]}
+    ]
+  },
+  {
+    "id": "steam_1850510",
+    "title": "TRIANGLE STRATEGY",
+    "aliases": ["Triangle Strategy"],
+    "storeUrl": "https://store.steampowered.com/app/1850510/",
+    "editionScope": "Base Steam game; the Deluxe Edition artbook is not a gameplay feature.",
+    "summary": "A story-focused tactics RPG in which convictions and group votes shape the route, while terrain and coordinated attacks matter in battles.",
+    "facets": {
+      "setting": {"value": "fantasy", "status": "provisional", "evidenceIds": ["TS-world"]},
+      "structure": {"value": "squad", "status": "source_supported", "evidenceIds": ["TS-combat"]},
+      "campaign": {"value": "mission", "status": "provisional", "evidenceIds": ["TS-format"]},
+      "progression": {"value": ["unique_characters", "equipment"], "status": "source_supported", "evidenceIds": ["TS-combat"]},
+      "positioning": {"value": true, "status": "source_supported", "evidenceIds": ["TS-combat"]},
+      "combos": {"value": true, "status": "source_supported", "evidenceIds": ["TS-combat"]},
+      "narrative": {"value": true, "status": "source_supported", "evidenceIds": ["TS-world"]},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Distinctive allied units and coordinated follow-up attacks offer a roster-composition alternative to broad class mixing.", "evidenceIds": ["TS-combat"]}],
+    "tradeoffs": [{"text": "Story decisions involve persuading allies and group votes. These systems do not imply unrestricted branching or a measured level of tactical freedom.", "evidenceIds": ["TS-world"]}],
+    "evidence": [
+      {"id": "TS-world", "statement": "The store describes fictional Norzelia, convictions, story paths and decisions resolved through allies' votes.", "basis": "source_report", "url": "https://store.steampowered.com/app/1850510/", "locator": "About This Game opening; Convictions; Voting", "checkedDate": "2026-10-29", "limitations": ["Fantasy is a provisional catalogue setting label; no historical-authenticity assessment is implied."]},
+      {"id": "TS-combat", "statement": "The developer names terrain/elevation, distinctive party members, flanking follow-ups, coordinated abilities and character/weapon improvements.", "basis": "source_report", "url": "https://store.steampowered.com/app/1850510/", "locator": "Highly Strategic Battles; Converse With and Strengthen Your Allies", "checkedDate": "2026-10-29", "limitations": ["Strengthening a named character is not evidence of freeform class customization."]},
+      {"id": "TS-format", "statement": "We classify the described story battles and optional mock battles as a mission-oriented campaign.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1850510/", "locator": "Highly Strategic Battles; Encampment and Mental Mock Battles", "checkedDate": "2026-10-29", "limitations": ["A profile classification, not a measured campaign or session length."]}
+    ]
+  },
+  {
+    "id": "steam_1096530",
+    "title": "Solasta: Crown of the Magister",
+    "aliases": ["Solasta", "Solasta Crown of the Magister"],
+    "storeUrl": "https://store.steampowered.com/app/1096530/",
+    "editionScope": "Original Steam campaign; expansion classes, ancestries and campaigns are not assumed.",
+    "summary": "Build a four-hero fantasy party and use tabletop-style rules, dice and three-dimensional terrain in tactical encounters.",
+    "facets": {
+      "setting": {"value": "fantasy", "status": "source_supported", "evidenceIds": ["SOL-party"]},
+      "structure": {"value": "party", "status": "source_supported", "evidenceIds": ["SOL-party"]},
+      "campaign": {"value": "mission", "status": "provisional", "evidenceIds": ["SOL-format"]},
+      "progression": {"value": "class_based", "status": "source_supported", "evidenceIds": ["SOL-party"]},
+      "positioning": {"value": true, "status": "source_supported", "evidenceIds": ["SOL-environment"]},
+      "combos": {"value": true, "status": "provisional", "evidenceIds": ["SOL-format"]},
+      "narrative": {"value": true, "status": "source_supported", "evidenceIds": ["SOL-party"]},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Race/class choices and complementary party skills give a concrete basis for party-building searches.", "evidenceIds": ["SOL-party"]}],
+    "tradeoffs": [{"text": "The developer explicitly describes dice deciding outcomes. Tabletop rules fidelity is separate from real-world authenticity.", "evidenceIds": ["SOL-environment"]}],
+    "evidence": [
+      {"id": "SOL-party", "statement": "The developer describes a fantasy adventure with four created heroes, class/race choices and dialogue influenced by their personalities.", "basis": "source_report", "url": "https://store.steampowered.com/app/1096530/", "locator": "About This Game opening; An Epic Team Adventure", "checkedDate": "2026-10-29", "limitations": ["Specific expansion options are not included; narrative quality is unassessed."]},
+      {"id": "SOL-environment", "statement": "The description names dice rolls, opportunity attacks, vertical positioning, light/darkness and destructible environmental objects.", "basis": "source_report", "url": "https://store.steampowered.com/app/1096530/", "locator": "Bring the Authentic Tabletop Gaming Experience; Discover a Mysterious and Dynamic World", "checkedDate": "2026-10-29", "limitations": ["No firsthand rules/implementation test was performed."]},
+      {"id": "SOL-format", "statement": "We infer a mission-oriented adventure with party-skill interactions from its dungeon and encounter descriptions.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1096530/", "locator": "An Epic Team Adventure; Discover a Mysterious and Dynamic World", "checkedDate": "2026-10-29", "limitations": ["Campaign format and combination relevance are provisional classifications."]}
+    ]
+  },
+  {
+    "id": "steam_1086940",
+    "title": "Baldur's Gate 3",
+    "aliases": ["BG3", "Baldurs Gate 3", "Baldur’s Gate 3"],
+    "storeUrl": "https://store.steampowered.com/app/1086940/",
+    "editionScope": "Current base Steam offering; no mod-specific mechanics assumed.",
+    "summary": "A fantasy party RPG combining class-based character creation, companion stories, consequential choices and environmental interaction.",
+    "facets": {
+      "setting": {"value": "fantasy", "status": "source_supported", "evidenceIds": ["BG-party"]},
+      "structure": {"value": "party", "status": "source_supported", "evidenceIds": ["BG-party"]},
+      "campaign": {"value": "open", "status": "provisional", "evidenceIds": ["BG-exploration"]},
+      "progression": {"value": ["class_based", "unique_characters"], "status": "source_supported", "evidenceIds": ["BG-party"]},
+      "positioning": {"value": true, "status": "source_supported", "evidenceIds": ["BG-combat"]},
+      "combos": {"value": true, "status": "provisional", "evidenceIds": ["BG-combat"]},
+      "narrative": {"value": true, "status": "source_supported", "evidenceIds": ["BG-party"]},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Class choices, Origin characters and companion decisions connect party construction with narrative role-playing.", "evidenceIds": ["BG-party"]}],
+    "tradeoffs": [{"text": "The profile includes narrative and exploration alongside combat. Open is a provisional exploration label, not a claim of unlimited access throughout the campaign.", "evidenceIds": ["BG-exploration"]}],
+    "evidence": [
+      {"id": "BG-party", "statement": "The store describes a Dungeons and Dragons party RPG with class/race creation, Origin heroes and choice-responsive companion stories.", "basis": "source_report", "url": "https://store.steampowered.com/app/1086940/", "locator": "Short description; About This Game: character creation; Origin heroes", "checkedDate": "2026-10-29", "limitations": ["Build quality and narrative quality are not rated here."]},
+      {"id": "BG-exploration", "statement": "We use an open-exploration label for its described experimentation and varied approaches within a narrative adventure.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1086940/", "locator": "About This Game: exploration and world interaction paragraphs", "checkedDate": "2026-10-29", "limitations": ["Does not mean the campaign is unrestricted or lacks progression boundaries."]},
+      {"id": "BG-combat", "statement": "The developer names vertical movement, shoving, environmental interactions, team initiative and modifiers; combination relevance is our interpretation.", "basis": "source_report", "url": "https://store.steampowered.com/app/1086940/", "locator": "About This Game: verticality; D&D 5e combat paragraph", "checkedDate": "2026-10-29", "limitations": ["Combination relevance is provisional; described dice modifiers are not a no-randomness promise."]}
+    ]
+  },
+  {
+    "id": "steam_435150",
+    "title": "Divinity: Original Sin 2 - Definitive Edition",
+    "aliases": ["DOS2", "DOS 2", "Divinity Original Sin 2", "Divinity: Original Sin II"],
+    "storeUrl": "https://store.steampowered.com/app/435150/",
+    "editionScope": "Steam Definitive Edition; no mod-specific mechanics assumed.",
+    "summary": "Explore a fantasy world with a customizable party, combining elemental abilities, environmental hazards and elevation in turn-based battles.",
+    "facets": {
+      "setting": {"value": "fantasy", "status": "source_supported", "evidenceIds": ["DOS-party"]},
+      "structure": {"value": "party", "status": "source_supported", "evidenceIds": ["DOS-party"]},
+      "campaign": {"value": "open", "status": "provisional", "evidenceIds": ["DOS-exploration"]},
+      "progression": {"value": "skill_based", "status": "source_supported", "evidenceIds": ["DOS-combat"]},
+      "positioning": {"value": true, "status": "source_supported", "evidenceIds": ["DOS-combat"]},
+      "combos": {"value": true, "status": "source_supported", "evidenceIds": ["DOS-combat"]},
+      "narrative": {"value": true, "status": "source_supported", "evidenceIds": ["DOS-party"]},
+      "offline": {"value": null, "status": "unknown", "evidenceIds": []}
+    },
+    "notes": [{"text": "Skills from multiple schools and elemental combinations provide a different development emphasis from fixed class trees.", "evidenceIds": ["DOS-combat"]}],
+    "tradeoffs": [{"text": "Open describes exploration opportunities, not unlimited campaign access. The interactions described do not establish that every build is equally viable.", "evidenceIds": ["DOS-exploration", "DOS-combat"]}],
+    "evidence": [
+      {"id": "DOS-party", "statement": "The store describes a fantasy party adventure with custom or Origin characters, companion relationships and identity-reactive quests.", "basis": "source_report", "url": "https://store.steampowered.com/app/435150/", "locator": "About This Game: Who Will You Be?; party and Origin-character paragraphs", "checkedDate": "2026-10-29", "limitations": ["Identity and story descriptions are not quality grades."]},
+      {"id": "DOS-combat", "statement": "The developer describes elemental combinations, height advantages, environmental weapons and skills across multiple schools.", "basis": "source_report", "url": "https://store.steampowered.com/app/435150/", "locator": "It's Time for a New Divinity; next-generation turn-based combat bullet", "checkedDate": "2026-10-29", "limitations": ["Comparative build outcomes and balance were not tested."]},
+      {"id": "DOS-exploration", "statement": "We classify the described world exploration and experimentation as open exploration within an authored adventure.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/435150/", "locator": "Ascend as the God Rivellon Needs; exploration/experimentation bullet", "checkedDate": "2026-10-29", "limitations": ["This label does not promise unrestricted access to every area from the start."]}
+    ]
+  }
+]
