@@ -1,4 +1,5 @@
 import type { Criterion, CriterionValue, FeatureDefinition } from "./types.ts";
+import { translate, type Locale } from "./i18n.ts";
 
 export const TAXONOMY_VERSION = "1.0";
 
@@ -76,29 +77,39 @@ export const TAXONOMY: readonly FeatureDefinition[] = [
   },
 ];
 
-export function getFeature(featureId: string): FeatureDefinition | undefined {
-  return TAXONOMY.find((feature) => feature.id === featureId);
+const CHINESE_TAXONOMY: readonly FeatureDefinition[] = TAXONOMY.map((feature) => ({
+  ...feature,
+  label: translate("zh", feature.label),
+  options: feature.options.map((option) => ({ ...option, label: translate("zh", option.label) })),
+}));
+
+export function getTaxonomy(locale: Locale = "en"): readonly FeatureDefinition[] {
+  return locale === "zh" ? CHINESE_TAXONOMY : TAXONOMY;
 }
 
-export function getFeatureLabel(featureId: string): string {
-  return getFeature(featureId)?.label ?? "Unassessed requirement";
+export function getFeature(featureId: string, locale: Locale = "en"): FeatureDefinition | undefined {
+  return getTaxonomy(locale).find((feature) => feature.id === featureId);
 }
 
-export function getValueLabel(featureId: string, value: CriterionValue): string {
-  return getFeature(featureId)?.options.find((option) => option.value === value)?.label
+export function getFeatureLabel(featureId: string, locale: Locale = "en"): string {
+  return getFeature(featureId, locale)?.label ?? translate(locale, "Unassessed requirement");
+}
+
+export function getValueLabel(featureId: string, value: CriterionValue, locale: Locale = "en"): string {
+  return getFeature(featureId, locale)?.options.find((option) => option.value === value)?.label
     ?? String(value);
 }
 
-export function getCriterionLabel(criterion: Pick<Criterion, "featureId" | "value" | "operator">): string {
-  const feature = getFeature(criterion.featureId);
-  if (!feature) return "Unassessed requirement";
+export function getCriterionLabel(criterion: Pick<Criterion, "featureId" | "value" | "operator">, locale: Locale = "en"): string {
+  const feature = getFeature(criterion.featureId, locale);
+  if (!feature) return translate(locale, "Unassessed requirement");
   if (criterion.operator === "neq") {
     const label = typeof criterion.value === "boolean"
-      ? getValueLabel(criterion.featureId, !criterion.value)
-      : `Exclude ${getValueLabel(criterion.featureId, criterion.value)}`;
-    return `${feature.label}: ${label}`;
+      ? getValueLabel(criterion.featureId, !criterion.value, locale)
+      : translate(locale, "Exclude {value}", { value: getValueLabel(criterion.featureId, criterion.value, locale) });
+    return translate(locale, "{feature}: {value}", { feature: feature.label, value: label });
   }
-  return `${feature.label}: ${getValueLabel(criterion.featureId, criterion.value)}`;
+  return translate(locale, "{feature}: {value}", { feature: feature.label, value: getValueLabel(criterion.featureId, criterion.value, locale) });
 }
 
 export function isAllowedValue(featureId: string, value: unknown): value is CriterionValue {

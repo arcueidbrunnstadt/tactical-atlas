@@ -2,7 +2,7 @@
   {
     "id": "steam_637090",
     "title": "BATTLETECH",
-    "aliases": ["BattleTech", "MechWarrior BATTLETECH"],
+    "aliases": ["BattleTech", "MechWarrior BATTLETECH", "暴战机甲兵"],
     "storeUrl": "https://store.steampowered.com/app/637090/",
     "editionScope": "Base Steam game; expansion-specific features are not assumed.",
     "summary": "Command a mech squad while maintaining a mercenary company through an interstellar civil-war campaign.",
@@ -27,7 +27,7 @@
   {
     "id": "steam_1043810",
     "title": "Tactical Breach Wizards",
-    "aliases": ["TBW"],
+    "aliases": ["TBW", "战术突破巫师"],
     "storeUrl": "https://store.steampowered.com/app/1043810/",
     "editionScope": "Base Steam campaign; Special Edition extras are excluded from matching.",
     "summary": "Guide a team of modern-day wizards through authored tactical encounters, combining character-specific powers and revising plans.",
@@ -52,7 +52,7 @@
   {
     "id": "steam_268500",
     "title": "XCOM 2",
-    "aliases": ["XCOM® 2"],
+    "aliases": ["XCOM® 2", "幽浮2"],
     "storeUrl": "https://store.steampowered.com/app/268500/",
     "editionScope": "Base Steam game; War of the Chosen and other DLC are separate offerings.",
     "summary": "Lead a resistance squad through missions while developing soldiers, researching equipment and managing a mobile headquarters.",
@@ -77,7 +77,7 @@
   {
     "id": "steam_590380",
     "title": "Into the Breach",
-    "aliases": ["ITB"],
+    "aliases": ["ITB", "陷阵之志"],
     "storeUrl": "https://store.steampowered.com/app/590380/",
     "editionScope": "Current Steam offering, including its advertised free Advanced Edition update.",
     "summary": "Control future mechs against an alien threat, using advance attack information to protect civilian buildings across repeatable attempts.",
@@ -102,7 +102,7 @@
   {
     "id": "steam_1084160",
     "title": "Jagged Alliance 3",
-    "aliases": ["JA3", "Jagged Alliance III"],
+    "aliases": ["JA3", "Jagged Alliance III", "铁血联盟3"],
     "storeUrl": "https://store.steampowered.com/app/1084160/",
     "editionScope": "Base Steam offering; no unstated mod features included.",
     "summary": "Recruit mercenaries, develop their perks and equipment, and make campaign decisions in the fictional country of Grand Chien.",
@@ -127,7 +127,7 @@
   {
     "id": "steam_365360",
     "title": "Battle Brothers",
-    "aliases": ["BattleBrothers"],
+    "aliases": ["BattleBrothers", "战场兄弟"],
     "storeUrl": "https://store.steampowered.com/app/365360/",
     "editionScope": "Base game description; DLC-specific origins and features are not assumed.",
     "summary": "Manage a mercenary company in a generated medieval-fantasy world, choosing contracts, recruits, equipment and training.",
@@ -152,7 +152,7 @@
   {
     "id": "steam_1527950",
     "title": "Wartales",
-    "aliases": ["War Tales"],
+    "aliases": ["War Tales", "战争传说"],
     "storeUrl": "https://store.steampowered.com/app/1527950/",
     "editionScope": "Base Steam game; expansion regions and paid contracts are not assumed.",
     "summary": "Explore a medieval world with a mercenary group, taking contracts and developing companions, equipment and camp facilities.",
@@ -178,7 +178,7 @@
   {
     "id": "steam_699170",
     "title": "Fell Seal: Arbiter's Mark",
-    "aliases": ["Fell Seal", "Fell Seal Arbiters Mark"],
+    "aliases": ["Fell Seal", "Fell Seal Arbiters Mark", "仲裁者之印"],
     "storeUrl": "https://store.steampowered.com/app/699170/",
     "editionScope": "Base game; Missions and Monsters expansion-specific content is not assumed.",
     "summary": "A fantasy tactical RPG with authored story encounters, terrain elevation and character customization through classes, subclasses and passives.",
@@ -203,7 +203,7 @@
   {
     "id": "steam_1850510",
     "title": "TRIANGLE STRATEGY",
-    "aliases": ["Triangle Strategy"],
+    "aliases": ["Triangle Strategy", "三角战略"],
     "storeUrl": "https://store.steampowered.com/app/1850510/",
     "editionScope": "Base Steam game; the Deluxe Edition artbook is not a gameplay feature.",
     "summary": "A story-focused tactics RPG in which convictions and group votes shape the route, while terrain and coordinated attacks matter in battles.",
@@ -228,7 +228,7 @@
   {
     "id": "steam_1096530",
     "title": "Solasta: Crown of the Magister",
-    "aliases": ["Solasta", "Solasta Crown of the Magister"],
+    "aliases": ["Solasta", "Solasta Crown of the Magister", "索拉斯塔", "索拉斯塔：魔导师之冠"],
     "storeUrl": "https://store.steampowered.com/app/1096530/",
     "editionScope": "Original Steam campaign; expansion classes, ancestries and campaigns are not assumed.",
     "summary": "Build a four-hero fantasy party and use tabletop-style rules, dice and three-dimensional terrain in tactical encounters.",
@@ -253,7 +253,7 @@
   {
     "id": "steam_1086940",
     "title": "Baldur's Gate 3",
-    "aliases": ["BG3", "Baldurs Gate 3", "Baldur’s Gate 3"],
+    "aliases": ["BG3", "Baldurs Gate 3", "Baldur’s Gate 3", "博德之门3", "博德之门 3"],
     "storeUrl": "https://store.steampowered.com/app/1086940/",
     "editionScope": "Current base Steam offering; no mod-specific mechanics assumed.",
     "summary": "A fantasy party RPG combining class-based character creation, companion stories, consequential choices and environmental interaction.",
@@ -278,7 +278,7 @@
   {
     "id": "steam_435150",
     "title": "Divinity: Original Sin 2 - Definitive Edition",
-    "aliases": ["DOS2", "DOS 2", "Divinity Original Sin 2", "Divinity: Original Sin II"],
+    "aliases": ["DOS2", "DOS 2", "Divinity Original Sin 2", "Divinity: Original Sin II", "神界原罪2", "神界：原罪2", "神界：原罪2 终极版"],
     "storeUrl": "https://store.steampowered.com/app/435150/",
     "editionScope": "Steam Definitive Edition; no mod-specific mechanics assumed.",
     "summary": "Explore a fantasy world with a customizable party, combining elemental abilities, environmental hazards and elevation in turn-based battles.",
@@ -298,6 +298,294 @@
       {"id": "DOS-party", "statement": "The store describes a fantasy party adventure with custom or Origin characters, companion relationships and identity-reactive quests.", "basis": "source_report", "url": "https://store.steampowered.com/app/435150/", "locator": "About This Game: Who Will You Be?; party and Origin-character paragraphs", "checkedDate": "2026-10-29", "limitations": ["Identity and story descriptions are not quality grades."]},
       {"id": "DOS-combat", "statement": "The developer describes elemental combinations, height advantages, environmental weapons and skills across multiple schools.", "basis": "source_report", "url": "https://store.steampowered.com/app/435150/", "locator": "It's Time for a New Divinity; next-generation turn-based combat bullet", "checkedDate": "2026-10-29", "limitations": ["Comparative build outcomes and balance were not tested."]},
       {"id": "DOS-exploration", "statement": "We classify the described world exploration and experimentation as open exploration within an authored adventure.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/435150/", "locator": "Ascend as the God Rivellon Needs; exploration/experimentation bullet", "checkedDate": "2026-10-29", "limitations": ["This label does not promise unrestricted access to every area from the start."]}
+    ]
+  },
+  {
+    "id": "steam_660160",
+    "title": "Field of Glory II",
+    "aliases": ["FOG2", "荣耀战场2"],
+    "storeUrl": "https://store.steampowered.com/app/660160/",
+    "editionScope": "Base ancient-era game; Medieval and DLC army lists are separate.",
+    "summary": "Command ancient armies through historical or hypothetical battles and linked campaigns.",
+    "facets": {
+      "setting": {"value":"historical","status":"source_supported","evidenceIds":["FOG-battles"]},
+      "structure": {"value":"company","status":"provisional","evidenceIds":["FOG-campaign"]},
+      "campaign": {"value":"mission","status":"source_supported","evidenceIds":["FOG-campaign"]},
+      "progression": {"value":null,"status":"unknown","evidenceIds":[]},
+      "positioning": {"value":true,"status":"provisional","evidenceIds":["FOG-battles"]},
+      "combos": {"value":null,"status":"unknown","evidenceIds":[]},
+      "narrative": {"value":null,"status":"unknown","evidenceIds":[]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Army composition and experienced core units offer a different focus from individual hero builds.","evidenceIds":["FOG-battles","FOG-campaign"]}],
+    "tradeoffs": [{"text":"Army-roster and positioning labels are provisional; historical accuracy and balance are unassessed.","evidenceIds":["FOG-battles","FOG-campaign"]}],
+    "evidence": [
+      {"id":"FOG-battles","statement":"The publisher describes ancient armies, tile-based battles, varied terrain and historical or hypothetical scenarios.","basis":"source_report","url":"https://store.steampowered.com/app/660160/","locator":"About This Game; Features","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"FOG-campaign","statement":"The campaign links battles and increases the experience of surviving core units.","basis":"source_report","url":"https://store.steampowered.com/app/660160/","locator":"Features: Campaign mode","checkedDate":"2026-11-01","limitations":["A unit roster is provisionally grouped under company/roster; it is not a mercenary-company simulation."]}
+    ]
+  },
+  {
+    "id": "steam_1148490",
+    "title": "Second Front",
+    "aliases": ["第二战线"],
+    "storeUrl": "https://store.steampowered.com/app/1148490/",
+    "editionScope": "Base game description; future plans and DLC-specific additions are excluded.",
+    "summary": "Lead infantry and vehicles in World War II scenarios, with tools for creating maps and battles.",
+    "facets": {
+      "setting": {"value":"historical","status":"source_supported","evidenceIds":["SF-scenarios"]},
+      "structure": {"value":"company","status":"provisional","evidenceIds":["SF-scenarios"]},
+      "campaign": {"value":"mission","status":"provisional","evidenceIds":["SF-scenarios"]},
+      "progression": {"value":null,"status":"unknown","evidenceIds":[]},
+      "positioning": {"value":true,"status":"provisional","evidenceIds":["SF-terrain"]},
+      "combos": {"value":null,"status":"unknown","evidenceIds":[]},
+      "narrative": {"value":null,"status":"unknown","evidenceIds":[]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Infantry, vehicles and destructible terrain make combined forces a useful comparison point.","evidenceIds":["SF-scenarios","SF-terrain"]}],
+    "tradeoffs": [{"text":"Scenario-oriented play is a provisional campaign label; realism and balance are unassessed.","evidenceIds":["SF-scenarios","SF-terrain"]}],
+    "evidence": [
+      {"id":"SF-scenarios","statement":"The store describes WWII turn-based battles, infantry and vehicles, and scenario/map creation.","basis":"source_report","url":"https://store.steampowered.com/app/1148490/Second_Front/","locator":"Short description; About This Game","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"SF-terrain","statement":"The feature list names varied terrain, destructible buildings, bridges and environmental objects.","basis":"source_report","url":"https://store.steampowered.com/app/1148490/Second_Front/","locator":"About This Game: terrain bullet","checkedDate":"2026-11-01","limitations":["Positioning relevance is inferred from the advertised environment, not a comparative test."]}
+    ]
+  },
+  {
+    "id": "steam_1369370",
+    "title": "Combat Mission Shock Force 2",
+    "aliases": ["CMSF2", "战斗任务震慑力量2"],
+    "storeUrl": "https://store.steampowered.com/app/1369370/",
+    "editionScope": "Base game; Marines, British Forces, NATO Forces and Battle Pack content are excluded.",
+    "summary": "Command teams, squads and vehicles in a fictional Syrian conflict, using WEGO turns or real-time control.",
+    "facets": {
+      "setting": {"value":"contemporary","status":"source_supported","evidenceIds":["CMSF-format"]},
+      "structure": {"value":"squad","status":"source_supported","evidenceIds":["CMSF-units"]},
+      "campaign": {"value":"mission","status":"source_supported","evidenceIds":["CMSF-format"]},
+      "progression": {"value":null,"status":"unknown","evidenceIds":[]},
+      "positioning": {"value":true,"status":"source_supported","evidenceIds":["CMSF-units"]},
+      "combos": {"value":null,"status":"unknown","evidenceIds":[]},
+      "narrative": {"value":null,"status":"unknown","evidenceIds":[]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"WEGO orders and battlefield visibility offer an alternative to alternating individual-unit turns.","evidenceIds":["CMSF-format","CMSF-units"]}],
+    "tradeoffs": [{"text":"The setting is a hypothetical 2008 conflict; publisher realism claims are not independently validated.","evidenceIds":["CMSF-format","CMSF-units"]}],
+    "evidence": [
+      {"id":"CMSF-format","statement":"The publisher describes a hypothetical Syrian conflict, linked missions and selectable WEGO or real-time play.","basis":"source_report","url":"https://www.matrixgames.com/game/combat-mission-shock-force-2/pc","locator":"Introduction; Features","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"CMSF-units","statement":"The feature list includes teams, squads, vehicles, spotting, line of sight, cover and morale.","basis":"source_report","url":"https://www.matrixgames.com/game/combat-mission-shock-force-2/pc","locator":"Features: tactical scale; spotting; soldier posture","checkedDate":"2026-11-01","limitations":["Offline behavior, simulation authenticity and current-build implementation remain untested."]}
+    ]
+  },
+  {
+    "id": "steam_538480",
+    "title": "Xenonauts 2",
+    "aliases": ["异种航员2"],
+    "storeUrl": "https://store.steampowered.com/app/538480/",
+    "editionScope": "Current base game; no unstated mod features are included.",
+    "summary": "Defend Earth through tactical battles, covert bases and fighter-wing control against an alien invasion.",
+    "facets": {
+      "setting": {"value":"scifi","status":"source_supported","evidenceIds":["XN-resistance"]},
+      "structure": {"value":"squad","status":"provisional","evidenceIds":["XN-resistance"]},
+      "campaign": {"value":"mission","status":"provisional","evidenceIds":["XN-resistance"]},
+      "progression": {"value":null,"status":"unknown","evidenceIds":[]},
+      "positioning": {"value":null,"status":"unknown","evidenceIds":[]},
+      "combos": {"value":null,"status":"unknown","evidenceIds":[]},
+      "narrative": {"value":null,"status":"unknown","evidenceIds":[]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"The global base network and aerial layer extend decisions beyond ground encounters.","evidenceIds":["XN-resistance"]}],
+    "tradeoffs": [{"text":"Squad and mission labels are provisional; individual build systems and tactical quality remain unassessed.","evidenceIds":["XN-resistance"]}],
+    "evidence": [
+      {"id":"XN-resistance","statement":"The publisher describes special forces, turn-based battles, covert bases and controlled fighter wings resisting aliens.","basis":"source_report","url":"https://www.hoodedhorse.com/games/xenonauts-2","locator":"Introduction; game overview","checkedDate":"2026-11-01","limitations":["This short publisher overview does not establish detailed character-development or offline mechanics."]}
+    ]
+  },
+  {
+    "id": "steam_839770",
+    "title": "Phoenix Point",
+    "aliases": ["凤凰点"],
+    "storeUrl": "https://store.steampowered.com/app/839770/",
+    "editionScope": "Base game description; separately listed DLC mechanics are excluded.",
+    "summary": "Coordinate a global resistance, research equipment and fight alien forces with direct free-aim targeting.",
+    "facets": {
+      "setting": {"value":"scifi","status":"source_supported","evidenceIds":["PP-world"]},
+      "structure": {"value":"squad","status":"provisional","evidenceIds":["PP-aim"]},
+      "campaign": {"value":"mission","status":"provisional","evidenceIds":["PP-world"]},
+      "progression": {"value":"equipment","status":"source_supported","evidenceIds":["PP-aim"]},
+      "positioning": {"value":null,"status":"unknown","evidenceIds":[]},
+      "combos": {"value":null,"status":"unknown","evidenceIds":[]},
+      "narrative": {"value":true,"status":"source_supported","evidenceIds":["PP-world"]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Free aiming and faction diplomacy provide concrete differences from a purely encounter-based campaign.","evidenceIds":["PP-world","PP-aim"]}],
+    "tradeoffs": [{"text":"Mission structure is provisional; progression balance and tactical depth are unassessed.","evidenceIds":["PP-world","PP-aim"]}],
+    "evidence": [
+      {"id":"PP-world","statement":"The developer describes an alien-threat campaign with bases, research, factions and multiple narrative endings.","basis":"source_report","url":"https://store.steampowered.com/app/839770/","locator":"About This Game; Uncover the Secrets; Diplomatic Relations","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"PP-aim","statement":"The description explicitly covers equipping units and aiming their shots at body parts or weapons.","basis":"source_report","url":"https://store.steampowered.com/app/839770/","locator":"Take Aim on the Battlefield","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]}
+    ]
+  },
+  {
+    "id": "steam_243970",
+    "title": "Invisible, Inc.",
+    "aliases": ["Invisible Inc", "隐形公司"],
+    "storeUrl": "https://store.steampowered.com/app/243970/",
+    "editionScope": "Base game; Contingency Plan expansion content is excluded.",
+    "summary": "Infiltrate corporate facilities with a team of agents, combining stealth, equipment and security-hacking programs.",
+    "facets": {
+      "setting": {"value":"scifi","status":"provisional","evidenceIds":["II-builds"]},
+      "structure": {"value":"squad","status":"source_supported","evidenceIds":["II-missions"]},
+      "campaign": {"value":"mission","status":"source_supported","evidenceIds":["II-missions"]},
+      "progression": {"value":["unique_characters","equipment"],"status":"source_supported","evidenceIds":["II-builds"]},
+      "positioning": {"value":null,"status":"unknown","evidenceIds":[]},
+      "combos": {"value":true,"status":"provisional","evidenceIds":["II-builds"]},
+      "narrative": {"value":null,"status":"unknown","evidenceIds":[]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Agent selection, augments and programs support different infiltration approaches across generated missions.","evidenceIds":["II-missions","II-builds"]}],
+    "tradeoffs": [{"text":"Science-fiction and interaction labels are provisional; stealth tactics do not establish general combat depth.","evidenceIds":["II-missions","II-builds"]}],
+    "evidence": [
+      {"id":"II-missions","statement":"The developer describes agent-team infiltration missions with generated locations, threats and loot.","basis":"source_report","url":"https://store.steampowered.com/app/243970/","locator":"About This Game; Key Features","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"II-builds","statement":"The feature list names unlockable agents, items, augments and hacking programs for customizing a run.","basis":"source_report","url":"https://store.steampowered.com/app/243970/","locator":"Key Features: Character selection; customization","checkedDate":"2026-11-01","limitations":["Interaction and setting classifications are interpretations; build viability was not tested."]}
+    ]
+  },
+  {
+    "id": "steam_599390",
+    "title": "Battle for Wesnoth",
+    "aliases": ["The Battle for Wesnoth", "韦诺之战"],
+    "storeUrl": "https://store.steampowered.com/app/599390/",
+    "editionScope": "Mainline game/campaign scope; add-on-specific mechanics are excluded.",
+    "summary": "Lead fantasy armies through story campaigns, developing veteran units and using terrain to shape battles.",
+    "facets": {
+      "setting": {"value":"fantasy","status":"source_supported","evidenceIds":["WES-campaign"]},
+      "structure": {"value":"company","status":"provisional","evidenceIds":["WES-tactics"]},
+      "campaign": {"value":"mission","status":"provisional","evidenceIds":["WES-campaign"]},
+      "progression": {"value":null,"status":"unknown","evidenceIds":[]},
+      "positioning": {"value":true,"status":"source_supported","evidenceIds":["WES-tactics"]},
+      "combos": {"value":null,"status":"unknown","evidenceIds":[]},
+      "narrative": {"value":true,"status":"source_supported","evidenceIds":["WES-campaign"]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Unit experience and advancement offer roster development beyond a fixed cast of heroes.","evidenceIds":["WES-campaign","WES-tactics"]}],
+    "tradeoffs": [{"text":"Advancement is not classified as freeform character building; add-ons and multiplayer balance remain unassessed.","evidenceIds":["WES-campaign","WES-tactics"]}],
+    "evidence": [
+      {"id":"WES-campaign","statement":"The project describes a fantasy world with story-led solo campaigns and multiplayer maps.","basis":"source_report","url":"https://store.steampowered.com/app/599390/","locator":"About This Game","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"WES-tactics","statement":"Project wiki guidance covers terrain-dependent defense, veteran units, recall and advancement.","basis":"source_report","url":"https://wiki.wesnoth.org/AdvancedTactics","locator":"Time of day; Small and strong; Advanceable units","checkedDate":"2026-11-01","limitations":["Community-maintained project guidance; not a current-build playtest or balance evaluation."]}
+    ]
+  },
+  {
+    "id": "steam_1451090",
+    "title": "Tactics Ogre: Reborn",
+    "aliases": ["Tactics Ogre Reborn", "皇家骑士团重生", "皇家骑士团 重生"],
+    "storeUrl": "https://store.steampowered.com/app/1451090/",
+    "editionScope": "Reborn edition; mechanics from the 1995 or 2010 versions are not assumed.",
+    "summary": "Build a force through class, equipment and skill choices while decisions shape a fantasy civil-war story.",
+    "facets": {
+      "setting": {"value":"fantasy","status":"provisional","evidenceIds":["TOR-story"]},
+      "structure": {"value":"squad","status":"provisional","evidenceIds":["TOR-builds"]},
+      "campaign": {"value":"mission","status":"provisional","evidenceIds":["TOR-builds"]},
+      "progression": {"value":["class_based","equipment"],"status":"source_supported","evidenceIds":["TOR-builds"]},
+      "positioning": {"value":true,"status":"provisional","evidenceIds":["TOR-builds"]},
+      "combos": {"value":null,"status":"unknown","evidenceIds":[]},
+      "narrative": {"value":true,"status":"source_supported","evidenceIds":["TOR-story"]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Individual unit levels and class/equipment combinations connect roster planning with story decisions.","evidenceIds":["TOR-story","TOR-builds"]}],
+    "tradeoffs": [{"text":"Fantasy, squad and positioning labels are provisional; no build-depth or balance score is assigned.","evidenceIds":["TOR-story","TOR-builds"]}],
+    "evidence": [
+      {"id":"TOR-story","statement":"The publisher describes a fictional civil war with branching story paths and multiple endings.","basis":"source_report","url":"https://www.square-enix-games.com/en_US/games/tactics-ogre-reborn","locator":"Story; Features: choices","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"TOR-builds","statement":"Reborn features individual unit levels, classes, equipment, skills, magic and three-dimensional tactical battlefields.","basis":"source_report","url":"https://www.square-enix-games.com/en_US/games/tactics-ogre-reborn","locator":"Features: battles; unit-by-unit level system","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]}
+    ]
+  },
+  {
+    "id": "steam_470310",
+    "title": "TROUBLESHOOTER: Abandoned Children",
+    "aliases": ["Troubleshooter", "纷争终结者"],
+    "storeUrl": "https://store.steampowered.com/app/470310/",
+    "editionScope": "Base first-season description; expansion-specific characters and missions are excluded.",
+    "summary": "Grow Albus's troubleshooting company through character stories, authored missions, classes and mastery combinations.",
+    "facets": {
+      "setting": {"value":"contemporary","status":"provisional","evidenceIds":["TSH-company"]},
+      "structure": {"value":["squad","company"],"status":"provisional","evidenceIds":["TSH-company"]},
+      "campaign": {"value":"mission","status":"source_supported","evidenceIds":["TSH-company"]},
+      "progression": {"value":["class_based","skill_based","unique_characters"],"status":"source_supported","evidenceIds":["TSH-masteries"]},
+      "positioning": {"value":null,"status":"unknown","evidenceIds":[]},
+      "combos": {"value":true,"status":"source_supported","evidenceIds":["TSH-masteries"]},
+      "narrative": {"value":true,"status":"source_supported","evidenceIds":["TSH-company"]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Classes and combinations of acquired masteries offer explicit character-development levers.","evidenceIds":["TSH-company","TSH-masteries"]}],
+    "tradeoffs": [{"text":"Contemporary is a broad fictional-world label; advertised offline support has not been tested here.","evidenceIds":["TSH-company","TSH-masteries"]}],
+    "evidence": [
+      {"id":"TSH-company","statement":"The developer describes Albus's company, colleagues' stories and individually authored missions in fictional Valhalla.","basis":"source_report","url":"https://store.steampowered.com/app/470310/","locator":"About This Game: Valhalla; Beginning; unique missions","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"TSH-masteries","statement":"Characters use specialized classes and acquire masteries whose combinations activate additional effects.","basis":"source_report","url":"https://store.steampowered.com/app/470310/","locator":"Specialized classes; masteries","checkedDate":"2026-11-01","limitations":["Counts and advertised offline mode do not establish balance, build viability or working offline access."]}
+    ]
+  },
+  {
+    "id": "steam_1811600",
+    "title": "Vestaria Saga II: The Sacred Sword of Silvanister",
+    "aliases": ["Vestaria Saga II", "维斯塔利亚传说2"],
+    "storeUrl": "https://store.steampowered.com/app/1811600/",
+    "editionScope": "Publisher description of the English base edition; conflicting save/difficulty details are not relied on.",
+    "summary": "Follow Zade's fantasy campaign, recruiting distinct characters and maneuvering units across authored grid maps.",
+    "facets": {
+      "setting": {"value":"fantasy","status":"source_supported","evidenceIds":["VS-story"]},
+      "structure": {"value":"squad","status":"provisional","evidenceIds":["VS-maps"]},
+      "campaign": {"value":"mission","status":"provisional","evidenceIds":["VS-maps"]},
+      "progression": {"value":["unique_characters","equipment"],"status":"source_supported","evidenceIds":["VS-maps"]},
+      "positioning": {"value":true,"status":"source_supported","evidenceIds":["VS-maps"]},
+      "combos": {"value":null,"status":"unknown","evidenceIds":[]},
+      "narrative": {"value":true,"status":"source_supported","evidenceIds":["VS-story"]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Positioning, movement and weapon selection are explicitly emphasized alongside recruitable characters.","evidenceIds":["VS-story","VS-maps"]}],
+    "tradeoffs": [{"text":"The publisher page mixes edition details; saving frequency and difficulty-mode claims remain unresolved.","evidenceIds":["VS-story","VS-maps"]}],
+    "evidence": [
+      {"id":"VS-story","statement":"The publisher describes Zade's continuing adventures, companions and a conflict involving the Margulites.","basis":"source_report","url":"https://vestariasagaii.dangenentertainment.com/","locator":"The Saga Continues; introductory story","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"VS-maps","statement":"The page emphasizes grid movement, positioning, weapons, recruitable characters, classes and strategic maps.","basis":"source_report","url":"https://vestariasagaii.dangenentertainment.com/","locator":"Introduction; feature bullets","checkedDate":"2026-11-01","limitations":["The same page contains inconsistent save/difficulty descriptions; neither is asserted in this profile."]}
+    ]
+  },
+  {
+    "id": "steam_1181830",
+    "title": "Urtuk: The Desolation",
+    "aliases": ["Urtuk", "乌尔图克荒凉"],
+    "storeUrl": "https://store.steampowered.com/app/1181830/",
+    "editionScope": "Base game; community modifications are outside this profile.",
+    "summary": "Guide a band through a generated dark-fantasy world, extracting enemy traits and exploiting battlefield hazards.",
+    "facets": {
+      "setting": {"value":"fantasy","status":"source_supported","evidenceIds":["URT-world"]},
+      "structure": {"value":"company","status":"provisional","evidenceIds":["URT-world"]},
+      "campaign": {"value":"open","status":"source_supported","evidenceIds":["URT-world"]},
+      "progression": {"value":["class_based","skill_based"],"status":"source_supported","evidenceIds":["URT-growth"]},
+      "positioning": {"value":true,"status":"source_supported","evidenceIds":["URT-growth"]},
+      "combos": {"value":true,"status":"source_supported","evidenceIds":["URT-growth"]},
+      "narrative": {"value":null,"status":"unknown","evidenceIds":[]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Extracted traits and learned skills can change a unit's role; pushing and counterattacks add interactions.","evidenceIds":["URT-world","URT-growth"]}],
+    "tradeoffs": [{"text":"Company/roster is a provisional label; survival demands and build viability are not rated.","evidenceIds":["URT-world","URT-growth"]}],
+    "evidence": [
+      {"id":"URT-world","statement":"The developer describes open-world survival, a generated campaign and a recruitable low-fantasy adventuring band.","basis":"source_report","url":"https://store.steampowered.com/app/1181830/","locator":"Introduction; Features","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"URT-growth","statement":"The description covers classes, extracted traits, learned skills, combo attacks and pushing enemies into hazards.","basis":"source_report","url":"https://store.steampowered.com/app/1181830/","locator":"Features; Dynamic battles; Characters","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]}
+    ]
+  },
+  {
+    "id": "steam_1611910",
+    "title": "Warhammer 40,000: Chaos Gate - Daemonhunters",
+    "aliases": ["Chaos Gate Daemonhunters", "战锤40K混沌之门恶魔猎人"],
+    "storeUrl": "https://store.steampowered.com/app/1611910/",
+    "editionScope": "Base game; Duty Eternal, Execution Force and edition-specific extras are excluded.",
+    "summary": "Lead Grey Knights through a science-fiction plague campaign, specializing classes and equipment between tactical missions.",
+    "facets": {
+      "setting": {"value":"scifi","status":"source_supported","evidenceIds":["CG-campaign"]},
+      "structure": {"value":"squad","status":"source_supported","evidenceIds":["CG-champions"]},
+      "campaign": {"value":"mission","status":"source_supported","evidenceIds":["CG-campaign"]},
+      "progression": {"value":["class_based","equipment"],"status":"source_supported","evidenceIds":["CG-champions"]},
+      "positioning": {"value":true,"status":"provisional","evidenceIds":["CG-environment"]},
+      "combos": {"value":null,"status":"unknown","evidenceIds":[]},
+      "narrative": {"value":true,"status":"source_supported","evidenceIds":["CG-campaign"]},
+      "offline": {"value":null,"status":"unknown","evidenceIds":[]}
+    },
+    "notes": [{"text":"Class specialization, psychic skills and equipment support squad-development searches.","evidenceIds":["CG-campaign","CG-champions","CG-environment"]}],
+    "tradeoffs": [{"text":"Positioning relevance is provisional; targeting claims do not establish that every system lacks randomness.","evidenceIds":["CG-campaign","CG-champions","CG-environment"]}],
+    "evidence": [
+      {"id":"CG-campaign","statement":"The publisher describes a 41st-millennium story campaign with facilities, research and missions across worlds.","basis":"source_report","url":"https://store.steampowered.com/app/1611910/","locator":"About This Game; Shape the Fate of the Galaxy","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"CG-champions","statement":"The feature list describes a customizable squad, class specialization, psychic abilities and equipment unlocks.","basis":"source_report","url":"https://store.steampowered.com/app/1611910/","locator":"Forge Your Champions","checkedDate":"2026-11-01","limitations":["Public source description; no firsthand gameplay or current-build test."]},
+      {"id":"CG-environment","statement":"The developer advertises using destructible pillars and vehicles against enemies.","basis":"source_report","url":"https://store.steampowered.com/app/1611910/","locator":"Cinematic Slaughter","checkedDate":"2026-11-01","limitations":["Positioning relevance is inferred; actual tactics and balance were not tested."]}
     ]
   }
 ]

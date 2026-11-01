@@ -1,0 +1,30 @@
+{
+  "steam_1043810": {
+    "src": "/game-images/tactical-breach-wizards.jpg",
+    "width": 960,
+    "height": 600,
+    "alt": {
+      "en": "Tactical Breach Wizards screenshot: chain lightning crosses a train rooftop.",
+      "zh": "《战术突破巫师》截图：连锁闪电穿过列车车顶。"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tactical-breach-wizards-screenshot.jpg",
+    "credit": "Suspicious Developments · CC BY-SA 4.0",
+    "permissionBasis": "The copyright holder's CC BY-SA 4.0 release is confirmed by Wikimedia VRT ticket 2025090310007255. The downloaded 960px rendition was resized by Wikimedia; Tactical Atlas made no pixel edits. Display framing may crop the image.",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "checkedDate": "2026-11-01"
+  },
+  "steam_599390": {
+    "src": "/game-images/wesnoth-1-12.jpg",
+    "width": 1280,
+    "height": 768,
+    "alt": {
+      "en": "Historical Battle for Wesnoth version 1.12 screenshot from 2015, showing units on a hex map.",
+      "zh": "《韦诺之战》1.12 版的历史截图（2015 年），展示六角格地图上的单位。"
+    },
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Battle_for_wesnoth_version_1.12.0_screenshot.jpg",
+    "credit": "Battle for Wesnoth developers · GPL-2.0-or-later · v1.12 (2015)",
+    "permissionBasis": "The source identifies this screenshot as GPL version 2 or later; the official Wesnoth copyright page confirms the project's artwork licensing. The original published JPEG is redistributed unchanged, with a local GPL-2.0 licence copy. This is a historical illustration, not current-build evidence.",
+    "licenseUrl": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
+    "checkedDate": "2026-11-01"
+  }
+}

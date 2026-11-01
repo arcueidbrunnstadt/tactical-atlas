@@ -1,10 +1,11 @@
 import { getCriterionLabel, getFeatureLabel, getValueLabel, isAllowedValue } from "./taxonomy.ts";
 import type { Criterion, GameFacet, GameRecord, MatchGroups, MatchReason, MatchResult, SearchQuery } from "./types.ts";
+import { translate, type Locale } from "./i18n.ts";
 
 const normalizedIdentity = (value: string): string => value.normalize("NFKC").trim().toLocaleLowerCase("en");
 
-function unknownReason(criterion: Criterion, text: string): MatchReason {
-  return { criterionId: criterion.id, label: getCriterionLabel(criterion), status: "unknown", text, evidenceIds: [] };
+function unknownReason(criterion: Criterion, text: string, locale: Locale): MatchReason {
+  return { criterionId: criterion.id, label: getCriterionLabel(criterion, locale), status: "unknown", text: translate(locale, text), evidenceIds: [] };
 }
 
 function usableEvidenceIds(game: GameRecord, facet: GameFacet): string[] {
@@ -13,47 +14,49 @@ function usableEvidenceIds(game: GameRecord, facet: GameFacet): string[] {
 }
 
 /** Missing, unsupported and provisional hard constraints are never factual passes. */
-export function evaluateCriterion(game: GameRecord, criterion: Criterion): MatchReason {
+export function evaluateCriterion(game: GameRecord, criterion: Criterion, locale: Locale = "en"): MatchReason {
   if (criterion.operator !== undefined && criterion.operator !== "eq" && criterion.operator !== "neq") {
-    return unknownReason(criterion, "This requirement uses an unsupported matching operator.");
+    return unknownReason(criterion, "This requirement uses an unsupported matching operator.", locale);
   }
   if (!isAllowedValue(criterion.featureId, criterion.value)) {
-    return unknownReason(criterion, "This requirement is outside the current matching vocabulary.");
+    return unknownReason(criterion, "This requirement is outside the current matching vocabulary.", locale);
   }
 
   const facet = game.facets[criterion.featureId];
   if (!facet || facet.status === "unknown" || facet.value === null) {
-    return unknownReason(criterion, "The available profile does not establish this requirement.");
+    return unknownReason(criterion, "The available profile does not establish this requirement.", locale);
   }
   if (facet.status !== "source_supported" && facet.status !== "provisional") {
-    return unknownReason(criterion, "The profile does not contain a recognized support status.");
+    return unknownReason(criterion, "The profile does not contain a recognized support status.", locale);
   }
 
   const values = Array.isArray(facet.value) ? facet.value : [facet.value];
   if (!values.length || !values.every((value) => isAllowedValue(criterion.featureId, value))) {
-    return unknownReason(criterion, "The profile does not contain a usable value for this requirement.");
+    return unknownReason(criterion, "The profile does not contain a usable value for this requirement.", locale);
   }
 
   const evidenceIds = usableEvidenceIds(game, facet);
   if (!evidenceIds.length || evidenceIds.length !== new Set(facet.evidenceIds).size) {
-    return unknownReason(criterion, "The profile's supporting evidence is missing or cannot be resolved.");
+    return unknownReason(criterion, "The profile's supporting evidence is missing or cannot be resolved.", locale);
   }
   if (criterion.importance === "must" && facet.status === "provisional") {
     return {
-      ...unknownReason(criterion, "This is a provisional profile assessment, so the required feature still needs checking."),
+      ...unknownReason(criterion, "This is a provisional profile assessment, so the required feature still needs checking.", locale),
       evidenceIds,
     };
   }
 
   const equal = values.some((value) => value === criterion.value);
   const matches = criterion.operator === "neq" ? !equal : equal;
-  const recorded = values.map((value) => getValueLabel(criterion.featureId, value)).join(", ");
-  const basis = facet.status === "provisional" ? "Provisional profile assessment" : "Source-supported profile";
+  const recorded = values.map((value) => getValueLabel(criterion.featureId, value, locale)).join(locale === "zh" ? "、" : ", ");
+  const basis = translate(locale, facet.status === "provisional" ? "Provisional profile assessment" : "Source-supported profile");
   return {
     criterionId: criterion.id,
-    label: getCriterionLabel(criterion),
+    label: getCriterionLabel(criterion, locale),
     status: matches ? "match" : "mismatch",
-    text: `${basis}: ${getFeatureLabel(criterion.featureId).toLocaleLowerCase("en")} — ${recorded}.`,
+    text: translate(locale, "{basis}: {feature} — {value}.", {
+      basis, feature: getFeatureLabel(criterion.featureId, locale).toLocaleLowerCase("en"), value: recorded,
+    }),
     evidenceIds,
   };
 }
@@ -86,7 +89,7 @@ function compareResults(a: MatchResult, b: MatchResult): number {
  * The caller must also display query.unhandledRequirements; this matcher never
  * treats those strings as assessed game facts or silently converts them to flags.
  */
-export function matchGames(games: readonly GameRecord[], query: SearchQuery): MatchGroups {
+export function matchGames(games: readonly GameRecord[], query: SearchQuery, locale: Locale = "en"): MatchGroups {
   const groups: MatchGroups = { matches: [], possible: [], excluded: [] };
   const criteria = uniqueCriteria(query.criteria);
   const excludedIdentities = new Set(query.excludedGameIds.map(normalizedIdentity));
@@ -103,12 +106,12 @@ export function matchGames(games: readonly GameRecord[], query: SearchQuery): Ma
       groups.excluded.push({
         game,
         score: 0,
-        reasons: [{ criterionId: "excluded-game", label: "Excluded by you", status: "mismatch", text: "You excluded this title from the shortlist.", evidenceIds: [] }],
+        reasons: [{ criterionId: "excluded-game", label: translate(locale, "Excluded by you"), status: "mismatch", text: translate(locale, "You excluded this title from the shortlist."), evidenceIds: [] }],
       });
       continue;
     }
 
-    const reasons = criteria.map((criterion) => evaluateCriterion(game, criterion));
+    const reasons = criteria.map((criterion) => evaluateCriterion(game, criterion, locale));
     const score = criteria.reduce((total, criterion, index) => {
       if (criterion.importance !== "preferred") return total;
       const outcome = reasons[index].status;
