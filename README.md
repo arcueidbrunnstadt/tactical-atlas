@@ -2,7 +2,9 @@
 
 An experimental way to discover games through the choices you enjoy: describe your preferences, edit the interpretation, and explore source-linked mechanics and tradeoffs.
 
-This experimental preview contains 12 tactical-combat and party-RPG profiles, editable hard/preferred criteria, game exclusions, explained ordering, source dossiers and two/three-game comparison. DeepSeek interpretation has passed small English/Chinese live checks and an observed browser search. This is a working concept, not a general accuracy evaluation or a comprehensive game database.
+This development branch contains **24 bilingual tactical-combat and party-RPG profiles**, editable hard/preferred criteria, game exclusions, explained ordering, source dossiers and two/three-game comparison. Shareable `/en` and `/zh` pages offer an English/简体中文 toggle that preserves the current search and selections without an AI request. Mobile refinements enlarge controls and text, improve narrow-screen navigation and contain comparison scrolling. Two games have permitted screenshots; the other 22 use title graphics. See [artwork sources and licences](docs/ARTWORK.md).
+
+**Deployment pending:** these improvements are implemented on `codex/bilingual-mobile-catalogue`; the live site still serves the previous 12-game release. This implementation used no new paid AI calls and keeps the original cumulative **US$10** application allowance unchanged. The preview remains a working concept, not a general accuracy evaluation or a comprehensive game database.
 
 [Try the preview](https://noctilucagame.com/) · [Report an issue or propose a contribution](https://github.com/arcueidbrunnstadt/tactical-atlas/issues) · [Roadmap](docs/ROADMAP.md)
 
@@ -59,4 +61,4 @@ The on-site feedback form accepts optional English or Chinese notes without an a
 
 The public export removes the production Site identity while preserving source, migrations and notices. See [hosting your own copy](docs/DEPLOYMENT.md).
 
-Original code is MIT licensed; preserve bundled/vendor dependency notices. Catalogue entries retain source attribution. External webpages and recordings are not redistributed or relicensed by this repository.
+Original code is MIT licensed; preserve bundled/vendor dependency notices. Catalogue entries retain source attribution. The two bundled screenshots retain their own licences and credits; see [ARTWORK.md](docs/ARTWORK.md). External webpages and recordings are not redistributed or relicensed by this repository.

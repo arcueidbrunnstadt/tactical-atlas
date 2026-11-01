@@ -1,19 +1,20 @@
 # Development roadmap
 
-**Implemented locally:** 12-game source-linked catalogue; editable criteria and exclusions; deterministic matching/order; dossiers; responsive comparison; structured interpretation adapter; shared persistent quota logic and migrations; anonymous browser-session submission throttling.
+**Current live release:** the independent Hong Kong host at [noctilucagame.com](https://noctilucagame.com/) serves the 12-game preview with editable criteria and exclusions, explained matching, source dossiers, comparison and account-free private feedback. The source repository is public. DeepSeek has passed small English/Chinese live checks; the preserved cumulative US$10 application allowance and SQLite ledger remain authoritative. These checks do not establish general interpretation quality.
 
-**Live AI connected:** DeepSeek has returned successful English and Chinese interpretations, and an observed browser search verified editable criteria, an exact exclusion and an explicitly unresolved balance preference. The preserved cumulative allowance migration is deployed; the account uses CNY. These small checks do not establish general interpretation quality.
+**Implemented on `codex/bilingual-mobile-catalogue`, deployment pending:**
 
-**Public release in progress:** publish the clean source at [arcueidbrunnstadt/tactical-atlas](https://github.com/arcueidbrunnstadt/tactical-atlas), connect account-free private feedback, and verify the anonymous hosted flow with exact published/source revision records. Duplicate handling was observed live; the burst boundary has unit coverage but its live request timed out.
+- 24 sourced profiles, with bilingual summaries, scope, notes, tradeoffs and evidence statements. Stable identities, matching facts, original source links and explicit unknowns are preserved. English/Chinese names and aliases support title lookup.
+- Shareable `/en` and `/zh` pages and an English/简体中文 toggle. Language changes preserve typed requests, criteria, exclusions, comparisons and feedback text without a provider call.
+- Mobile refinements for readable controls, narrow navigation, cards, dialogs and contained comparison scrolling. Viewport checks and any physical-device observations must be reported separately.
+- Two permitted gameplay screenshots and 22 title-graphic fallbacks. Image credits, licence notices and the historical Wesnoth screenshot scope are recorded in [ARTWORK.md](ARTWORK.md).
 
-**Mainland-China access:** the public experience must work without a visitor ChatGPT/provider account. Actual mainland broadband/mobile reachability of the intended production domain remains unverified. Keep core assets and catalogue local, provide feedback without requiring a GitHub account, and evaluate other hosting only if the measured path requires it. A provider change alone does not establish website reachability.
+No new paid AI calls were used for this implementation. Deploy and verify the completed release while preserving the existing SQLite volume and original cumulative allowance; do not import the ledger again or start another paid counter. Complete production packaging and bilingual/mobile flow checks before describing these features as live.
 
-**First post-launch milestone: expand the searchable catalogue.** The owner has requested a more substantial preview collection after the first public release. Begin with 8–12 contrasting additions, bringing the collection to about 20–24 games as an initial checkpoint. This is a proposed batch size, not a launch condition or a final catalogue ceiling. Continue with further batches as search coverage and visitor requests justify them.
+**Mainland-China access:** on 1 November 2026, the owner reported successful page access and search in response to a requested direct mainland test. The reply did not restate the network type or test conditions. This is one owner observation, not a survey of mainland networks. Keep core assets and catalogue local and retain account-free feedback. A provider change alone does not establish website reachability.
 
-Prioritize historical/contemporary military tactics, contrasting science-fiction squad/company games, compact tactical encounters and less familiar games with documented character-development choices. Each addition should improve an actual search or comparison, carry edition-specific source links, and preserve unknowns. The larger catalogue should support visibly different shortlists for different requests.
+**After this release:** expand coverage in useful batches based on actual searches and feedback; add suitable artwork as its display and redistribution terms become clear; seek physical Android/iOS feedback and independent evidence review. The new 24-profile collection is a checkpoint, not a catalogue ceiling.
 
-Evaluate the expansion through a small set of before/after showcase searches and feedback about missing games or misunderstood preferences. Tactical freedom, balance, authenticity and degree of character-building depth remain open evaluation problems; increasing the title count does not establish those judgments.
+Tactical freedom, balance, authenticity and character-building depth remain open evaluation problems. More titles and illustrations do not establish those judgments. Broader preference research, player testing and additional genres can follow when they improve the request-to-explained-results experience.
 
-**Later research:** improve preference coverage; obtain independent evidence review and player feedback; investigate broad depth/balance/authenticity judgments; expand to other genres when useful.
-
-The first release does not need accounts, subscriptions, uploads, a large database or an automatic research agent. Keep the core request-to-explained-results experience useful before adding more infrastructure.
+The preview does not currently need accounts, subscriptions, uploads, a separate database service or an automatic research agent.
