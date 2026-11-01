@@ -197,7 +197,7 @@ test("Node startup and handoff CLIs operate on a synthetic persistent database w
   try {
     const filename = path.join(directory, "atlas.sqlite");
     const snapshotFile = path.join(directory, "synthetic-ledger.json");
-    const env = { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, DATABASE_PATH: filename };
+    const env = { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, DATABASE_PATH: filename, NODE_ENV: "test" as const };
     const run = (script: string, ...args: string[]) => JSON.parse(execFileSync(process.execPath,
       ["--experimental-strip-types", script, ...args], { cwd: process.cwd(), env, encoding: "utf8", windowsHide: true }));
     assert.deepEqual(run("scripts/node-migrate.mjs"), { schemaReady: true, ledgerHandoffReady: false });
