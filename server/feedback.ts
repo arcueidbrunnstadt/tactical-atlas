@@ -33,8 +33,18 @@ export function validateFeedbackInput(value: unknown): FeedbackInput {
 }
 
 /** Only a same-origin JSON form is accepted; no public feedback read API exists. */
-export async function readFeedbackRequest(request: Request): Promise<FeedbackInput> {
-  const origin = new URL(request.url).origin;
+export async function readFeedbackRequest(request: Request, configuredOrigin?: string, requireConfiguredOrigin = false): Promise<FeedbackInput> {
+  let origin: string;
+  try {
+    if (configuredOrigin) {
+      const parsed = new URL(configuredOrigin);
+      if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.origin !== configuredOrigin) throw new Error("Invalid origin");
+      origin = parsed.origin;
+    } else {
+      if (requireConfiguredOrigin) throw new Error("Missing origin");
+      origin = new URL(request.url).origin;
+    }
+  } catch { throw new FeedbackError("FEEDBACK_ORIGIN_REJECTED", 403); }
   const fetchSite = request.headers.get("sec-fetch-site");
   if (request.headers.get("origin") !== origin || (fetchSite && fetchSite !== "same-origin" && fetchSite !== "none")) {
     throw new FeedbackError("FEEDBACK_ORIGIN_REJECTED", 403);

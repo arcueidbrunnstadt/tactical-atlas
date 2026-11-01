@@ -4,13 +4,15 @@ An experimental way to discover games through the choices you enjoy: describe yo
 
 This experimental preview contains 12 tactical-combat and party-RPG profiles, editable hard/preferred criteria, game exclusions, explained ordering, source dossiers and two/three-game comparison. DeepSeek interpretation has passed small English/Chinese live checks and an observed browser search. This is a working concept, not a general accuracy evaluation or a comprehensive game database.
 
-[Try the preview](https://tactical-atlas-search-preview.niftygleam19.chatgpt.site) · [Report an issue or propose a contribution](https://github.com/arcueidbrunnstadt/tactical-atlas/issues) · [Roadmap](docs/ROADMAP.md)
+[Try the preview](https://noctilucagame.com/) · [Report an issue or propose a contribution](https://github.com/arcueidbrunnstadt/tactical-atlas/issues) · [Roadmap](docs/ROADMAP.md)
 
-Public release and mainland network verification are being completed. The website's feedback form is available without a GitHub account. Hosting reachability from mainland China must be measured separately from the choice of AI provider.
+The preview runs on an independent Hong Kong host with HTTPS and live DeepSeek interpretation. A Chinese search and duplicate-request protection passed on 1 November 2026; the owner also reported successful website access and search in response to a direct mainland test request. This is one owner observation, not a survey of networks. The website and its private feedback form require no account. See [the hosting issue](https://github.com/arcueidbrunnstadt/tactical-atlas/issues/1) for the original access problem.
 
 ## Run locally
 
-Use Node.js 22.13 or newer with npm:
+This version targets **Node.js 24** and persistent SQLite. See [the independent-host guide](docs/INDEPENDENT_HOST.md) for standalone/Docker packaging and the required existing-ledger handoff. The previous Sites preview is kept as a manual-only fallback with AI disabled.
+
+Use Node.js 24 with npm:
 
 ```sh
 npm ci
@@ -33,7 +35,9 @@ The experimental catalogue includes games with turn-based tactical combat, inclu
 
 ## Hosted API setup
 
-The backend expects a Sites/Cloudflare `DB` D1 binding and the committed migrations. Configure `DEEPSEEK_API_KEY` as a **server secret**, never as a public variable. Set `AI_PROVIDER=deepseek`, `AI_MODEL=deepseek-flash`, and `AI_BILLING_CURRENCY=USD` or `CNY` to match the account. Keep `AI_ENABLED=false` until migrations, account readiness, the price/currency envelope and the shared budget are verified. Thinking, tools and streaming are explicitly disabled; there are no automatic retries.
+For this branch, follow [the independent-host guide](docs/INDEPENDENT_HOST.md). Node hosting uses the SQLite adapter and requires a validated handoff of the existing trial before AI can run. A fresh database cannot start a second paid counter.
+
+Configure an absolute persistent `DATABASE_PATH` and apply the committed migrations. Set `APP_ORIGIN` to the actual public HTTPS origin. Configure `DEEPSEEK_API_KEY` as a **server secret**, never as a public variable. Set `AI_PROVIDER=deepseek`, `AI_MODEL=deepseek-flash`, and `AI_BILLING_CURRENCY=USD` or `CNY` to match the account. Keep `AI_ENABLED=false` until the old host is disabled, a fresh ledger handoff is imported, account readiness and the price/currency envelope are verified. Thinking, tools and streaming are explicitly disabled; there are no automatic retries.
 
 All paid development and public requests must use the same hosted ledger. Each DeepSeek call atomically reserves **three US cents** from the cumulative 1,000-cent trial and a 100-call UTC-day allowance. The migration preserves the three legacy one-cent reservations and the original counter. Reservations are not refunded after dispatch. Never run a second independent paid local counter. At the end of the allowance the app retains browsing/manual controls. This bound covers this application's requests, not unrelated key use or hosting charges.
 
@@ -45,7 +49,7 @@ The request text is sent to DeepSeek when live interpretation is enabled. Applic
 
 Submission throttling uses a separate server secret (`AI_THROTTLE_SECRET`, at least 32 random characters) to derive a pseudonymous client identifier. Accepted submissions are limited to 3 in a rolling 60 seconds and 20 per UTC day before the shared paid allowance is reserved. Only the hash, server attempt ID, UTC day and timestamp are stored; records older than 24 hours are deleted on subsequent submissions. Missing configuration, trusted identity or storage fails closed for AI; manual browsing stays available.
 
-The default `AI_CLIENT_IDENTITY_MODE=browser-session` uses a server-issued, signed first-party cookie with Secure, HttpOnly and SameSite=Lax attributes and UTC-day expiry. No visitor account is required. Clearing cookies or using another browser can reset this best-effort client allowance; the shared cumulative and global daily budget guards remain authoritative. `sites-user` optionally uses the identity supplied by Sites for signed-in private checks. The optional `cloudflare-ip` mode must remain disabled until the hosted ingress is verified to supply an original, non-spoofable visitor IP; Worker forwarding can change `CF-Connecting-IP`. Arbitrary client IDs or `X-Forwarded-For` are not trusted.
+The Node host supports `AI_CLIENT_IDENTITY_MODE=browser-session` only. It uses a server-issued, signed first-party cookie with Secure, HttpOnly and SameSite=Lax attributes and UTC-day expiry. No visitor account is required. Clearing cookies or using another browser can reset this best-effort client allowance; the shared cumulative and global daily budget guards remain authoritative. Sites/Cloudflare identity headers, arbitrary client IDs and `X-Forwarded-For` are not trusted on this independent host.
 
 ## Contribute
 

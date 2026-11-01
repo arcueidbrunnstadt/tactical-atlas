@@ -1,5 +1,4 @@
-import { env } from "cloudflare:workers";
-import type { QuotaDatabase } from "../../../server/quota";
+import { nodeBindings } from "../../../server/node-env";
 import { resolveThrottleClient } from "../../../server/throttle";
 import { FeedbackError, feedbackPseudonym, readFeedbackRequest, submitFeedback } from "../../../server/feedback";
 
@@ -10,9 +9,9 @@ const reply = (body: unknown, status: number, cookie?: string) => Response.json(
 export async function POST(request: Request) {
   let cookie: string | undefined;
   try {
-    const body = await readFeedbackRequest(request);
+    const bindings = nodeBindings();
+    const body = await readFeedbackRequest(request, bindings.APP_ORIGIN, process.env.NODE_ENV === "production");
     // Feedback does not depend on AI_ENABLED, a provider key or the AI ledger.
-    const bindings = env as unknown as { DB?: QuotaDatabase; AI_THROTTLE_SECRET?: string };
     const identity = await resolveThrottleClient(request.headers, bindings.AI_THROTTLE_SECRET, "browser-session");
     cookie = identity.setCookie;
     const client = await feedbackPseudonym(identity.clientHash, bindings.AI_THROTTLE_SECRET);
