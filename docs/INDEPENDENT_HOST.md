@@ -1,6 +1,8 @@
 # Independent-host trial
 
-This branch prepares the preview for a Node.js 24 Linux host with persistent SQLite storage. The existing Sites deployment is a separate checkout and stays unchanged. The initial infrastructure planning ceiling is US$30 for a domain year and one host month; no domain, host account or purchase is created by these files.
+The preview runs at [noctilucagame.com](https://noctilucagame.com/) on a Node.js 24 Linux host with persistent SQLite storage and Caddy HTTPS. The existing Sites deployment remains a separate checkout with AI disabled. The initial infrastructure planning ceiling was US$30 for a domain year and one host month; these files do not create a domain, host account or purchase.
+
+The 1 November 2026 cutover disabled AI on the old host, exported and validated its four spending-ledger tables, imported them into the persistent SQLite volume, reconciled the saved counters and source marker, and then enabled the new host. The cumulative US$10 allowance was preserved. A live Chinese request returned structured criteria; repeating its UUID returned409 `duplicate_request`. Pricing references still expire after seven days and require operator review before 5 November 2026. No credential or ledger snapshot belongs in this repository.
 
 The interface, catalogue, interpretation validation and cumulative API allowance are retained. Copying the former Cloudflare build to a generic server is insufficient: this branch replaces the runtime/storage binding and supplies a Node standalone build. Mainland reachability remains an observed test to perform after hosting, not a property guaranteed by the build or region.
 

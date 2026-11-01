@@ -4,13 +4,13 @@ An experimental way to discover games through the choices you enjoy: describe yo
 
 This experimental preview contains 12 tactical-combat and party-RPG profiles, editable hard/preferred criteria, game exclusions, explained ordering, source dossiers and two/three-game comparison. DeepSeek interpretation has passed small English/Chinese live checks and an observed browser search. This is a working concept, not a general accuracy evaluation or a comprehensive game database.
 
-[Try the preview](https://tactical-atlas-search-preview.niftygleam19.chatgpt.site) · [Report an issue or propose a contribution](https://github.com/arcueidbrunnstadt/tactical-atlas/issues) · [Roadmap](docs/ROADMAP.md)
+[Try the preview](https://noctilucagame.com/) · [Report an issue or propose a contribution](https://github.com/arcueidbrunnstadt/tactical-atlas/issues) · [Roadmap](docs/ROADMAP.md)
 
-The current `chatgpt.site` address has reported access blocks; see [the hosting issue](https://github.com/arcueidbrunnstadt/tactical-atlas/issues/1). This branch prepares an independent-host build and does not establish a working replacement URL. The website's feedback form requires no GitHub account. Hosting reachability from mainland China must be measured separately from the choice of AI provider.
+The preview runs on an independent Hong Kong host with HTTPS and live DeepSeek interpretation. A Chinese search and duplicate-request protection passed on 1 November 2026; the owner also reported successful website access and search in response to a direct mainland test request. This is one owner observation, not a survey of networks. The website and its private feedback form require no account. See [the hosting issue](https://github.com/arcueidbrunnstadt/tactical-atlas/issues/1) for the original access problem.
 
 ## Run locally
 
-This independent-host branch targets **Node.js 24** and persistent SQLite rather than a Sites/Cloudflare binding. See [the independent-host guide](docs/INDEPENDENT_HOST.md) for standalone/Docker packaging and the required existing-ledger handoff. The production Sites checkout is unchanged.
+This version targets **Node.js 24** and persistent SQLite. See [the independent-host guide](docs/INDEPENDENT_HOST.md) for standalone/Docker packaging and the required existing-ledger handoff. The previous Sites preview is kept as a manual-only fallback with AI disabled.
 
 Use Node.js 24 with npm:
 
