@@ -1,5 +1,5 @@
 import { createInterpretationJsonSchema, QueryValidationError, validateInterpretRequest, validateModelInterpretation } from "../lib/query-schema.ts";
-import type { CatalogueIdentity, InterpretRequestBody, ValidatedInterpretation } from "../lib/query-schema.ts";
+import type { CatalogueIdentity, InterpretationValidationReason, InterpretRequestBody, ValidatedInterpretation } from "../lib/query-schema.ts";
 import { TAXONOMY } from "../lib/taxonomy.ts";
 
 export const PROVIDER_CONFIG = Object.freeze({
@@ -55,10 +55,13 @@ export interface ProviderInterpretation extends ValidatedInterpretation {
 
 export type ProviderFetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
-type DiagnosticStage = "credentials" | "signal" | "dispatch" | "http_response" | "response_read";
+type DiagnosticStage = "credentials" | "signal" | "dispatch" | "http_response" | "response_read"
+  | "output_extract" | "interpretation_validate";
 type DiagnosticCategory = "invalid_key_format" | "timeout" | "illegal_invocation" | "invalid_header"
   | "request_context" | "network_dns" | "network_connection" | "network_tls" | "network" | "unknown"
-  | "access_denied" | "quota_exhausted" | "rate_limit" | "request_configuration" | "model_unavailable" | "http_error" | "redirect_blocked";
+  | "access_denied" | "quota_exhausted" | "rate_limit" | "request_configuration" | "model_unavailable" | "http_error" | "redirect_blocked"
+  | "invalid_response_body" | "output_shape" | "output_json" | "interpretation_schema" | "interpretation_exception"
+  | InterpretationValidationReason;
 
 /** Only fixed classifications and a bounded HTTP status may enter logs. */
 function diagnostic(stage: DiagnosticStage, category: DiagnosticCategory, status?: number): void {
@@ -92,6 +95,11 @@ function object(value: unknown): value is Record<string, unknown> {
 
 function invalidResponse(): ProviderError {
   return new ProviderError("INVALID_RESPONSE", 502, "The AI response could not be validated. Please edit the requirements manually or try again.");
+}
+
+function invalidOutput(category: "output_shape" | "output_json"): ProviderError {
+  diagnostic("output_extract", category);
+  return invalidResponse();
 }
 
 function configurationError(): ProviderError {
@@ -182,7 +190,7 @@ function extractInterpretation(response: unknown): unknown {
   if (!object(response) || response.status !== "completed" || response.error) {
     throw new ProviderError("INCOMPLETE_RESPONSE", 502, "The AI did not finish interpreting this request. You can edit the requirements manually.");
   }
-  if (!Array.isArray(response.output)) throw invalidResponse();
+  if (!Array.isArray(response.output)) throw invalidOutput("output_shape");
   const texts: string[] = [];
   for (const output of response.output) {
     if (!object(output) || !Array.isArray(output.content)) continue;
@@ -194,8 +202,8 @@ function extractInterpretation(response: unknown): unknown {
       if (content.type === "output_text" && typeof content.text === "string") texts.push(content.text);
     }
   }
-  if (texts.length !== 1) throw invalidResponse();
-  try { return JSON.parse(texts[0]); } catch { throw invalidResponse(); }
+  if (texts.length !== 1) throw invalidOutput("output_shape");
+  try { return JSON.parse(texts[0]); } catch { throw invalidOutput("output_json"); }
 }
 
 function count(value: unknown): number | null {
@@ -289,7 +297,10 @@ export async function interpretRequest(
     stage = "response_read";
     raw = await responseJson(response);
   } catch (error) {
-    if (error instanceof ProviderError) throw error;
+    if (error instanceof ProviderError) {
+      if (stage === "response_read" && error.code === "INVALID_RESPONSE") diagnostic(stage, "invalid_response_body");
+      throw error;
+    }
     const category = transportCategory(error);
     diagnostic(stage, category);
     if (category === "timeout") {
@@ -298,11 +309,13 @@ export async function interpretRequest(
     throw new ProviderError("PROVIDER_UNAVAILABLE", 503, "The AI provider could not be reached. Manual requirements are available.");
   }
 
+  const modelOutput = extractInterpretation(raw);
   let interpretation: ValidatedInterpretation;
   try {
-    interpretation = validateModelInterpretation(extractInterpretation(raw), { ...request, catalogue: options.catalogue });
+    interpretation = validateModelInterpretation(modelOutput, { ...request, catalogue: options.catalogue });
   } catch (error) {
-    if (error instanceof ProviderError) throw error;
+    diagnostic("interpretation_validate", error instanceof QueryValidationError
+      ? error.validationReason ?? "interpretation_schema" : "interpretation_exception");
     throw invalidResponse();
   }
   const usage = object(raw) && object(raw.usage) ? raw.usage : {};

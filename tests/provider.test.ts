@@ -502,3 +502,21 @@ test("transport diagnostics expose only fixed categories and distinguish dispatc
     ["PROVIDER_DIAGNOSTIC", { stage: "response_read", category: "network" }],
   ]);
 });
+
+test("invalid replies report the validation stage without logging provider content", async (t) => {
+  const log = t.mock.method(console, "error", () => {});
+  const privateText = "PRIVATE_PROVIDER_CONTENT";
+  const replies = [
+    [() => new Response(privateText), "response_read", "invalid_response_body"],
+    [() => Response.json({ status: "completed", output: [] }), "output_extract", "output_shape"],
+    [() => Response.json({ status: "completed", output: [{ content: [{ type: "output_text", text: privateText }] }] }), "output_extract", "output_json"],
+    [() => Response.json(payload({ ...model, unsolicitedFacts: privateText })), "interpretation_validate", "interpretation_root"],
+    [() => Response.json(payload({ ...model, criteria: [{ ...model.criteria[0], sourceText: privateText }] })), "interpretation_validate", "criterion_quote"],
+    [() => Response.json(payload({ ...model, unhandledRequirements: [{ sourceText: privateText, importance: "must" }] })), "interpretation_validate", "unresolved_quote"],
+  ] as const;
+  for (const [response, stage, category] of replies) {
+    await assert.rejects(interpretRequest(base, async () => response()), rejectsWith("INVALID_RESPONSE"));
+    assert.deepEqual(log.mock.calls.at(-1)?.arguments, ["PROVIDER_DIAGNOSTIC", { stage, category }]);
+  }
+  assert.equal(log.mock.callCount(), replies.length);
+});

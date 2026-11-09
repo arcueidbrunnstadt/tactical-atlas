@@ -14,16 +14,26 @@ const MAX_MODEL_UNHANDLED = 8;
 // A safe reply can retain all model-provided notes plus any represented condition set aside here.
 export const MAX_RETURNED_UNRESOLVED_REQUIREMENTS = MAX_MODEL_UNHANDLED + MAX_REPRESENTED_CONDITIONS;
 
+export type InterpretationValidationReason =
+  | "interpretation_root" | "legacy_exclusion_shape" | "criterion_shape" | "numeric_quote"
+  | "alternatives_shape" | "alternative_group" | "alternative_option" | "duplicate_alternative"
+  | "criterion_quote" | "alternative_quote" | "unresolved_quote"
+  | "condition_limit" | "ambiguous_required_values" | "legacy_exclusion_value" | "unresolved_shape"
+  | "unresolved_priority_conflict" | "clarification_shape" | "clarification_status" | "missing_unresolved"
+  | "contradictory_required_values" | "returned_unresolved_limit";
+
 export class QueryValidationError extends Error {
   code: "INVALID_REQUEST" | "QUERY_TOO_LARGE" | "TAXONOMY_MISMATCH" | "INVALID_INTERPRETATION";
+  readonly validationReason?: InterpretationValidationReason;
 
-  constructor(code: QueryValidationError["code"]) {
+  constructor(code: QueryValidationError["code"], validationReason?: InterpretationValidationReason) {
     super(code === "TAXONOMY_MISMATCH" ? "The search vocabulary changed. Reload and try again."
       : code === "QUERY_TOO_LARGE" ? "Please shorten the search request."
         : code === "INVALID_INTERPRETATION" ? "The AI response could not be validated."
           : "The search request is invalid.");
     this.name = "QueryValidationError";
     this.code = code;
+    this.validationReason = validationReason;
   }
 }
 
@@ -106,14 +116,16 @@ export function validateModelInterpretation(
   value: unknown,
   context: InterpretRequestBody & { catalogue: readonly CatalogueIdentity[] },
 ): ValidatedInterpretation {
-  const invalid = (): never => { throw new QueryValidationError("INVALID_INTERPRETATION"); };
+  const invalid = (reason: InterpretationValidationReason): never => {
+    throw new QueryValidationError("INVALID_INTERPRETATION", reason);
+  };
   if (!record(value) || (!exactKeys(value, currentModelRootKeys) && !exactKeys(value, legacyModelRootKeys)
       && !exactKeys(value, legacyGroupedModelRootKeys))
       || !["ready", "clarification", "unsupported"].includes(String(value.status))
       || !Array.isArray(value.criteria) || value.criteria.length > MAX_REPRESENTED_CONDITIONS
-      || !Array.isArray(value.unhandledRequirements) || value.unhandledRequirements.length > MAX_MODEL_UNHANDLED) return invalid();
+      || !Array.isArray(value.unhandledRequirements) || value.unhandledRequirements.length > MAX_MODEL_UNHANDLED) return invalid("interpretation_root");
   const modelExclusions = Object.hasOwn(value, "excludedGameIds") ? value.excludedGameIds : [];
-  if (!Array.isArray(modelExclusions) || modelExclusions.length > context.catalogue.length) return invalid();
+  if (!Array.isArray(modelExclusions) || modelExclusions.length > context.catalogue.length) return invalid("legacy_exclusion_shape");
 
   const criteria: InterpretedCriterion[] = [];
   for (const [index, candidate] of value.criteria.entries()) {
@@ -122,10 +134,10 @@ export function validateModelInterpretation(
         || !isAllowedOperator(candidate.featureId, candidate.operator)
         || (candidate.importance !== "must" && candidate.importance !== "preferred")
         || (candidate.weight !== 1 && candidate.weight !== 3)
-        || !boundedText(candidate.sourceText, MAX_QUERY_CHARACTERS)
-        || !context.query.includes(candidate.sourceText)) return invalid();
+        || !boundedText(candidate.sourceText, MAX_QUERY_CHARACTERS)) return invalid("criterion_shape");
+    if (!context.query.includes(candidate.sourceText)) return invalid("criterion_quote");
     if (candidate.featureId === CAMPAIGN_HOURS_FEATURE
-        && (typeof candidate.value !== "number" || !quotesWholeHourTarget(candidate.sourceText, candidate.value))) return invalid();
+        && (typeof candidate.value !== "number" || !quotesWholeHourTarget(candidate.sourceText, candidate.value))) return invalid("numeric_quote");
     criteria.push({
       id: `${context.requestId}:${index + 1}`,
       featureId: candidate.featureId,
@@ -137,15 +149,16 @@ export function validateModelInterpretation(
     });
   }
   const rawAlternatives = Object.hasOwn(value, "alternatives") ? value.alternatives : [];
-  if (!Array.isArray(rawAlternatives) || rawAlternatives.length > MAX_ALTERNATIVE_GROUPS) return invalid();
+  if (!Array.isArray(rawAlternatives) || rawAlternatives.length > MAX_ALTERNATIVE_GROUPS) return invalid("alternatives_shape");
   const alternatives: (AlternativeGroup & { sourceText: string })[] = [];
   for (const [index, group] of rawAlternatives.entries()) {
     if (!record(group) || !exactKeys(group, alternativeKeys)
         || (group.importance !== "must" && group.importance !== "preferred")
         || (group.weight !== 1 && group.weight !== 3)
-        || !boundedText(group.sourceText, MAX_QUERY_CHARACTERS) || !context.query.includes(group.sourceText)
+        || !boundedText(group.sourceText, MAX_QUERY_CHARACTERS)
         || criteria.some(({ sourceText }) => sourceText === group.sourceText)
-        || !Array.isArray(group.options) || group.options.length < MIN_ALTERNATIVE_OPTIONS || group.options.length > MAX_ALTERNATIVE_OPTIONS) return invalid();
+        || !Array.isArray(group.options) || group.options.length < MIN_ALTERNATIVE_OPTIONS || group.options.length > MAX_ALTERNATIVE_OPTIONS) return invalid("alternative_group");
+    if (!context.query.includes(group.sourceText)) return invalid("alternative_quote");
 
     const options: AlternativeOption[] = [];
     for (const option of group.options) {
@@ -153,9 +166,9 @@ export function validateModelInterpretation(
           || (typeof option.value !== "string" && typeof option.value !== "boolean")
           || !isAllowedValue(option.featureId, option.value)
           || (option.operator !== "eq" && option.operator !== "neq")
-          || !isAllowedOperator(option.featureId, option.operator)) return invalid();
+          || !isAllowedOperator(option.featureId, option.operator)) return invalid("alternative_option");
       const validated = { featureId: option.featureId, value: option.value, operator: option.operator } satisfies AlternativeOption;
-      if (options.some((item) => getAlternativeOptionKey(item) === getAlternativeOptionKey(validated))) return invalid();
+      if (options.some((item) => getAlternativeOptionKey(item) === getAlternativeOptionKey(validated))) return invalid("duplicate_alternative");
       options.push(validated);
     }
     alternatives.push({
@@ -166,18 +179,18 @@ export function validateModelInterpretation(
 
   const conditions = [...criteria, ...alternatives];
   if (conditions.filter((item) => item.importance === "must").length > MAX_CONDITIONS_PER_PRIORITY
-      || conditions.filter((item) => item.importance === "preferred").length > MAX_CONDITIONS_PER_PRIORITY) return invalid();
+      || conditions.filter((item) => item.importance === "preferred").length > MAX_CONDITIONS_PER_PRIORITY) return invalid("condition_limit");
 
   // Distinct required values for the same feature need distinct atomic quotes.
   // Reusing the entire quote can turn a single choice into simultaneous musts.
   if (criteria.some((item, index) => item.importance === "must" && item.operator === "eq"
       && criteria.slice(index + 1).some((other) => other.importance === "must" && other.operator === "eq"
-        && item.featureId === other.featureId && item.value !== other.value && item.sourceText === other.sourceText))) return invalid();
+        && item.featureId === other.featureId && item.value !== other.value && item.sourceText === other.sourceText))) return invalid("ambiguous_required_values");
 
   // Older provider replies can still be replayed, but never decide which titles disappear.
   if (modelExclusions.length) {
     const allowedIds = new Set(context.catalogue.map((game) => game.id));
-    if (!modelExclusions.every((id) => typeof id === "string" && allowedIds.has(id))) return invalid();
+    if (!modelExclusions.every((id) => typeof id === "string" && allowedIds.has(id))) return invalid("legacy_exclusion_value");
   }
   const titleExclusions = resolveTitleExclusions(context.query, context.catalogue);
   const excludedGameIds = [...new Set(titleExclusions.flatMap(({ gameIds }) => gameIds))];
@@ -208,17 +221,17 @@ export function validateModelInterpretation(
       sourceText = item;
       importance = "unknown";
     } else if (record(item) && exactKeys(item, unresolvedKeys)
-        && boundedText(item.sourceText, MAX_QUERY_CHARACTERS) && context.query.includes(item.sourceText)
-        && isUnresolvedPriority(item.importance)) {
+        && boundedText(item.sourceText, MAX_QUERY_CHARACTERS) && isUnresolvedPriority(item.importance)) {
+      if (!context.query.includes(item.sourceText)) return invalid("unresolved_quote");
       sourceText = item.sourceText;
       importance = item.importance;
     } else {
-      return invalid();
+      return invalid("unresolved_shape");
     }
     if (belongsToTitleExclusion(sourceText)) continue;
     if (record(item)) structuredQuotes.add(sourceText);
     const previous = unresolved.get(sourceText);
-    if (previous && previous.importance !== importance) return invalid();
+    if (previous && previous.importance !== importance) return invalid("unresolved_priority_conflict");
     if (!previous) unresolved.set(sourceText, {
       id: `${context.requestId}:unresolved:${unresolved.size + 1}`, sourceText, importance,
     });
@@ -235,17 +248,17 @@ export function validateModelInterpretation(
         || !boundedText(value.clarification.question, 300)
         || !Array.isArray(value.clarification.choices)
         || value.clarification.choices.length < 2 || value.clarification.choices.length > 4
-        || !value.clarification.choices.every((choice) => boundedText(choice, 160))) return invalid();
+        || !value.clarification.choices.every((choice) => boundedText(choice, 160))) return invalid("clarification_shape");
     clarification = { question: value.clarification.question, choices: [...value.clarification.choices] };
   }
-  if ((value.status === "clarification") !== (clarification !== null)) return invalid();
-  if (value.status === "unsupported" && value.unhandledRequirements.length === 0 && !titleExclusions.length) return invalid();
+  if ((value.status === "clarification") !== (clarification !== null)) return invalid("clarification_status");
+  if (value.status === "unsupported" && value.unhandledRequirements.length === 0 && !titleExclusions.length) return invalid("missing_unresolved");
 
   // A model must ask for clarification rather than pretending contradictory musts are ready.
   if (value.status === "ready") {
     const musts = criteria.filter((item) => item.importance === "must");
     if (musts.some((item) => item.operator === "eq" && musts.some((other) => other.operator === "neq"
-        && item.featureId === other.featureId && item.value === other.value))) return invalid();
+        && item.featureId === other.featureId && item.value === other.value))) return invalid("contradictory_required_values");
   }
 
   // Retain a condition whose mapping cannot be justified. Keep the rest of the
@@ -328,7 +341,7 @@ export function validateModelInterpretation(
       unresolved.set(sourceText, { id, sourceText, importance: "must" });
     }
   }
-  if (unresolved.size > MAX_RETURNED_UNRESOLVED_REQUIREMENTS) return invalid();
+  if (unresolved.size > MAX_RETURNED_UNRESOLVED_REQUIREMENTS) return invalid("returned_unresolved_limit");
   let status = value.status as ValidatedInterpretation["status"];
   if (status === "unsupported" && excludedGameIds.length) status = "ready";
   if (status === "ready" && !represented.length && !excludedGameIds.length
