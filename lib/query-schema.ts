@@ -127,6 +127,8 @@ export function validateModelInterpretation(
   const modelExclusions = Object.hasOwn(value, "excludedGameIds") ? value.excludedGameIds : [];
   if (!Array.isArray(modelExclusions) || modelExclusions.length > context.catalogue.length) return invalid("legacy_exclusion_shape");
 
+  const managementScopes = managementScopeClauses(context.query);
+  const requiredScopes = managementScopes.filter(({ required }) => required);
   const criteria: InterpretedCriterion[] = [];
   for (const [index, candidate] of value.criteria.entries()) {
     if (!record(candidate) || !exactKeys(candidate, criterionKeys)
@@ -137,8 +139,14 @@ export function validateModelInterpretation(
         || !boundedText(candidate.sourceText, MAX_QUERY_CHARACTERS)) return invalid("criterion_shape");
     const equipmentPreference = candidate.featureId === "progression" && candidate.value === "equipment"
       && candidate.operator === "eq" && candidate.importance === "preferred" && candidate.weight === 1;
-    const sourceText = originalQuote(context.query, candidate.sourceText)
-      ?? (equipmentPreference ? explicitEquipmentPreference(context.query) : undefined);
+    let sourceText = context.query.includes(candidate.sourceText) ? candidate.sourceText : undefined;
+    if (!sourceText) {
+      const rebound = originalQuote(context.query, candidate.sourceText);
+      // A repaired proxy quote can only point to a clause the scope guard will hold.
+      if (rebound && requiredScopes.some((scope) => (scope.conditional || candidate.featureId === "structure")
+          && quoteIsWithin(context.query, rebound, scope.sourceText))) sourceText = rebound;
+      else if (equipmentPreference) sourceText = explicitEquipmentPreference(context.query);
+    }
     if (!sourceText) return invalid("criterion_quote");
     if (candidate.featureId === CAMPAIGN_HOURS_FEATURE
         && (typeof candidate.value !== "number" || !quotesWholeHourTarget(sourceText, candidate.value))) return invalid("numeric_quote");
@@ -161,9 +169,8 @@ export function validateModelInterpretation(
         || (group.weight !== 1 && group.weight !== 3)
         || !boundedText(group.sourceText, MAX_QUERY_CHARACTERS)
         || !Array.isArray(group.options) || group.options.length < MIN_ALTERNATIVE_OPTIONS || group.options.length > MAX_ALTERNATIVE_OPTIONS) return invalid("alternative_group");
-    const sourceText = originalQuote(context.query, group.sourceText);
-    if (!sourceText) return invalid("alternative_quote");
-    if (criteria.some((criterion) => criterion.sourceText === sourceText)) return invalid("alternative_group");
+    if (!context.query.includes(group.sourceText)) return invalid("alternative_quote");
+    if (criteria.some((criterion) => criterion.sourceText === group.sourceText)) return invalid("alternative_group");
 
     const options: AlternativeOption[] = [];
     for (const option of group.options) {
@@ -177,7 +184,7 @@ export function validateModelInterpretation(
       options.push(validated);
     }
     alternatives.push({
-      id: `${context.requestId}:alternatives:${index + 1}`, sourceText,
+      id: `${context.requestId}:alternatives:${index + 1}`, sourceText: group.sourceText,
       options, importance: group.importance, weight: group.weight,
     });
   }
@@ -285,8 +292,6 @@ export function validateModelInterpretation(
     else if (priorityRank[importance] > priorityRank[previous.importance]) unresolved.set(wording, { ...previous, importance });
     return false;
   };
-  const managementScopes = managementScopeClauses(context.query);
-  const requiredScopes = managementScopes.filter(({ required }) => required);
   const requiredGroups: { scopeStart: number; start: number; end: number }[] = [];
   const guardManagementScope = (item: Pick<InterpretedCriterion, "sourceText" | "importance">,
     includesStructure: boolean, grouped = false) => {

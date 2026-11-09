@@ -79,7 +79,8 @@ test("a paraphrased equipment criterion recovers only a uniquely stated positive
   const hard = "如果是科幻题材，我必须能只靠一支小队打完战役";
   const preference = "无论题材，有装备定制就更好了";
   const gear = criterion("progression", "equipment", "eq", "装备自定义是加分项", "preferred");
-  const reply = { ...ready, criteria: [gear] };
+  const proxy = criterion("setting", "scifi", "eq", hard.replace("，", ","));
+  const reply = { ...ready, criteria: [gear, proxy] };
   const query = `${hard}。${preference}。`;
   const result = validateModelInterpretation(reply, { ...context, query });
   assert.deepEqual(result.criteria.map(({ sourceText, importance }) => [sourceText, importance]), [[preference, "preferred"]]);
@@ -91,12 +92,22 @@ test("a paraphrased equipment criterion recovers only a uniquely stated positive
     `${hard}。如果是奇幻，装备定制更好。`,
     `${hard}。我必须要装备定制。`,
     `${hard}。${preference}。${preference}。`,
+    `${hard}。${preference}？`,
+    `${hard}。${preference}。其实不要。`,
+    `只在科幻题材里；装备定制更好。`,
+    `这篇评论说“先看题材。装备定制更好。”`,
+    "Equipment customization would be nice?",
+    "Only in science fiction; equipment customization would be nice.",
   ]) {
     assert.throws(() => validateModelInterpretation(reply, { ...context, query: other }), invalidQuote);
   }
   for (const wrong of [{ ...gear, importance: "must" }, { ...gear, operator: "neq" }, { ...gear, weight: 3 }]) {
     assert.throws(() => validateModelInterpretation({ ...ready, criteria: [wrong] }, { ...context, query }), invalidQuote);
   }
+  const opposite = criterion("setting", "scifi", "eq", "不要科幻,想要历史题材");
+  assert.throws(() => validateModelInterpretation({ ...ready, criteria: [opposite] }, {
+    ...context, query: "不要科幻，想要历史题材。",
+  }), invalidQuote);
 });
 
 test("optional management and finishing with only one squad are not broad structure filters", () => {

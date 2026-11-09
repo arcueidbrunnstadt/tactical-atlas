@@ -33,11 +33,22 @@ export function originalQuote(query: string, supplied: string): string | undefin
 // This is independent evidence for a positive preference. A topic mention,
 // conditional, negated statement or mandatory request does not qualify.
 const equipmentPreference = /^(?:I(?:['’]d| would)? prefer (?:equipment customization|to customize (?:my )?equipment)|equipment customization (?:would be nice(?: either way)?|would be a bonus)|(?:(?:无论|無論|不论|不論|不管)(?:什么|什麼|哪种|哪種)?(?:题材|題材)[,，]\s*)?有?(?:装备|裝備)(?:定制|订制|訂製|自定义|自定義|客製化)(?:功能)?就?(?:更好了?|会更好|會更好|是加分[项項]))$/iu;
+const independentPreference = /\beither way$|^(?:无论|無論|不论|不論|不管)/iu;
+const mentionsEquipment = /\b(?:equipment|gear|loadouts?|customiz\w*)\b|装备|裝備|装具|裝具|配装|配裝|定制|订制|訂製|自定义|自定義|客製/u;
 
 export function explicitEquipmentPreference(query: string): string | undefined {
-  const clauses = query.split(/[.!?;。！？；\r\n]+/u).map((clause) => clause.trim());
+  if (/[?？"“”「」『』《》]/u.test(query)) return;
+  const clauses = query.split(/[.!;。！；\r\n]+/u).map((clause) => clause.trim()).filter(Boolean);
   const matches = clauses.filter((clause) => equipmentPreference.test(clause));
-  return matches.length === 1 ? matches[0] : undefined;
+  if (matches.length !== 1) return;
+  const [preference] = matches;
+  if (clauses.length === 1) return preference;
+
+  // A reference such as "either way" must follow a clear separate condition.
+  const [condition, next] = clauses;
+  if (clauses.length === 2 && next === preference && independentPreference.test(preference)
+      && !mentionsEquipment.test(condition.toLowerCase())
+      && managementScopeClauses(condition).some((scope) => scope.required && scope.sourceText === condition)) return preference;
 }
 
 // Structure records management types. They do not establish whether a role can
