@@ -1,0 +1,26 @@
+name: Tactical Atlas candidate staging
+on:
+  push:
+    branches: [codex/discovery-staging-daffcf762e41]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  linux-staging:
+    if: github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'codex/discovery-staging-daffcf762e41')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      STAGE_REF: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Build and verify the pinned release on Linux
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$STAGE_REF" =~ ^[a-f0-9]{40}$ ]]
+          curl --fail --silent --show-error --retry 2 --max-time 60 \
+            "https://raw.githubusercontent.com/arcueidbrunnstadt/tactical-atlas/$STAGE_REF/.github/stage-tactical-atlas.sh" \
+            -o "$RUNNER_TEMP/stage-tactical-atlas.sh"
+          printf '%s  %s\n' '6cb61b8afb086aeb86736ca295e7c5220476cae465d266e3f9a1f3a1071b0493' "$RUNNER_TEMP/stage-tactical-atlas.sh" | sha256sum -c
+          sudo bash "$RUNNER_TEMP/stage-tactical-atlas.sh" --diagnostics 'codex/discovery-release-daffcf762e41' 'db70ba89b9eed8573fbec78e661986715a7ba119' '54d9014401e9d1d6046ff49f933ab1a062fc6e4f' | tee "$GITHUB_STEP_SUMMARY"
