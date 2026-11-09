@@ -4,11 +4,11 @@ An experimental way to discover games through the choices you enjoy: describe yo
 
 The live preview contains **24 bilingual tactical-combat and party-RPG profiles**, editable hard/preferred criteria, game exclusions, explained ordering, source dossiers and two/three-game comparison. Shareable `/en` and `/zh` pages offer an English/简体中文 toggle that preserves the current search and selections without an AI request. Mobile refinements enlarge controls and text, improve narrow-screen navigation and contain comparison scrolling. Two games have permitted screenshots; the other 22 use title graphics. See [artwork sources and licences](docs/ARTWORK.md).
 
-**Live as of 2 November 2026:** [PR #5](https://github.com/arcueidbrunnstadt/tactical-atlas/pull/5) is merged and the independent host runs commit `c52d5754972ad4ed4b4c98acbb71c796196a983c`. Implementation and deployment checks used no new paid AI generation and preserve the original cumulative **US$10** application allowance. See the [release verification and limits](docs/RELEASE_2026-11-02.md). The preview remains a working concept, not a general accuracy evaluation or a comprehensive game database.
+**Live as of 10 November 2026:** [PR #7](https://github.com/arcueidbrunnstadt/tactical-atlas/pull/7) is merged and the independent host runs commit `4d0ee40012dd12c37ba2ca3875a1d05966453a72` in manual mode. The deployment preserved the SQLite database, existing feedback, and original cumulative **US$10** application allowance. Public AI search is paused pending a passing private interpretation check. See the [November 2 release record](docs/RELEASE_2026-11-02.md) for the previous checkpoint.
 
 [Try the preview](https://noctilucagame.com/) · [Report an issue or propose a contribution](https://github.com/arcueidbrunnstadt/tactical-atlas/issues) · [Roadmap](docs/ROADMAP.md)
 
-The preview runs on an independent Hong Kong host with HTTPS and live DeepSeek interpretation. A Chinese search and duplicate-request protection passed on 1 November 2026; the owner also reported successful website access and search in response to a direct mainland test request. This is one owner observation, not a survey of networks. The website and its private feedback form require no account. See [the hosting issue](https://github.com/arcueidbrunnstadt/tactical-atlas/issues/1) for the original access problem.
+The preview runs on an independent Hong Kong host with HTTPS. When DeepSeek was active on 1 November 2026, a Chinese search and duplicate-request protection passed. The owner also reported successful website access and search in response to a direct mainland test request. The website and its private feedback form require no account. See [the hosting issue](https://github.com/arcueidbrunnstadt/tactical-atlas/issues/1) for the original access problem.
 
 ## Run locally
 
@@ -31,9 +31,9 @@ npm run build
 
 ## How search works
 
-The live path sends only the request, the fixed vocabulary and catalogue identities to the provider. The model returns structured criteria and exclusions; application code validates them and matches the public JSON catalogue. Edits rerank without another model call. Result explanations resolve to profile evidence. Provisional judgments and unknowns do not establish a factual must-have pass.
+When AI interpretation is enabled, it sends the request, the fixed vocabulary and catalogue identities to the provider. The model returns structured criteria and exclusions. Application code validates them and matches the public JSON catalogue. Manual edits rerank locally. Result explanations resolve to profile evidence, and required conditions with incomplete evidence stay in Needs checking.
 
-The current development version adds an editable minimum campaign length to the search criteria. Four base-campaign estimates support partial or full preference credit. The estimates leave mandatory playtime unresolved. See [search and evidence design](docs/SEARCH_DISCOVERY.md) for the requirements, scoring example and evaluation plan.
+The released shortlist supports either/or groups and editable approximate, minimum, or maximum campaign length. Four base-campaign estimates support partial or full preference credit. The estimates leave mandatory playtime unresolved. See [search and evidence design](docs/SEARCH_DISCOVERY.md) for the requirements, scoring example and evaluation plan.
 
 The experimental catalogue includes games with turn-based tactical combat, including party RPGs. It is not a comprehensive library or a set of overall quality ratings. Store-reported mechanics are distinguished from provisional interpretation; current offline behavior is unassessed throughout the initial catalogue.
 
@@ -45,7 +45,7 @@ Configure an absolute persistent `DATABASE_PATH` and apply the committed migrati
 
 All paid development and public requests must use the same hosted ledger. Each DeepSeek call atomically reserves **three US cents** from the cumulative 1,000-cent trial and a 100-call UTC-day allowance. The migration preserves the three legacy one-cent reservations and the original counter. Reservations are not refunded after dispatch. Never run a second independent paid local counter. At the end of the allowance the app retains browsing/manual controls. This bound covers this application's requests, not unrelated key use or hosting charges.
 
-The envelope uses peak, cache-miss prices plus headroom. CNY billing uses whole-fen rounding and a conservative 6.0 CNY/USD floor, below the checked 29 October 2026 SAFE reference of 6.7147. This is an application-usage bound, not an invoice exchange-rate promise. Pricing and currency references expire after seven days; review them before re-enabling. Unsupported/unconfirmed currency or stale references fail closed. See [current prices](https://api-docs.deepseek.com/quick_start/pricing/) and [billing sources](server/billing.ts).
+The envelope uses peak cache-miss prices plus headroom. CNY billing uses whole-fen rounding and a conservative 6.0 CNY/USD floor, below the 9 November 2026 SAFE reference of 6.7188. Pricing and currency references expire after seven days. Review them before re-enabling. Unsupported or unconfirmed currency and stale references pause paid search. See [current prices](https://api-docs.deepseek.com/quick_start/pricing/) and [billing sources](server/billing.ts).
 
 `/api/status` performs a free, cached account-metadata check even while generation is switched off, once configuration is complete. A successful check verifies key acceptance, an unambiguous matching currency and the provider's availability flag. It returns no balances or credentials. Search repeats that check before consuming a paid reservation. Only completed sanitized metadata is cached, never an in-flight I/O promise. The model is called once per paid explicit submission.
 
