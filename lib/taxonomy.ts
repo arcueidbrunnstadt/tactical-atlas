@@ -1,7 +1,14 @@
-import type { Criterion, CriterionValue, FeatureDefinition } from "./types.ts";
+import type { AlternativeOption, Criterion, CriterionOperator, CriterionValue, FeatureDefinition } from "./types.ts";
 import { translate, type Locale } from "./i18n.ts";
+import { isNumericComparisonOperator } from "./numeric-comparison.ts";
 
-export const TAXONOMY_VERSION = "1.0";
+// Also gates cached clients that cannot apply the current interpretation contract.
+export const TAXONOMY_VERSION = "1.5";
+export const MAX_ALTERNATIVE_GROUPS = 4;
+export const MIN_ALTERNATIVE_OPTIONS = 2;
+export const MAX_ALTERNATIVE_OPTIONS = 4;
+export const CAMPAIGN_HOURS_FEATURE = "campaign_hours";
+export const CAMPAIGN_HOUR_TARGET = { min: 1, max: 300, defaultValue: 50 } as const;
 
 export const TAXONOMY: readonly FeatureDefinition[] = [
   {
@@ -35,8 +42,9 @@ export const TAXONOMY: readonly FeatureDefinition[] = [
   {
     id: "progression",
     label: "Character and unit development",
+    categoricalCoverage: "partial",
     options: [
-      { value: "class_based", label: "Class and ability choices" },
+      { value: "class_based", label: "Class-based progression" },
       { value: "skill_based", label: "Skill and perk choices" },
       { value: "equipment", label: "Equipment customization" },
       { value: "unique_characters", label: "Distinct named characters" },
@@ -75,6 +83,12 @@ export const TAXONOMY: readonly FeatureDefinition[] = [
       { value: false, label: "Offline play is not supported" },
     ],
   },
+  {
+    id: CAMPAIGN_HOURS_FEATURE,
+    label: "Campaign length to a story ending",
+    options: [],
+    numericTarget: CAMPAIGN_HOUR_TARGET,
+  },
 ];
 
 const CHINESE_TAXONOMY: readonly FeatureDefinition[] = TAXONOMY.map((feature) => ({
@@ -103,6 +117,16 @@ export function getValueLabel(featureId: string, value: CriterionValue, locale: 
 export function getCriterionLabel(criterion: Pick<Criterion, "featureId" | "value" | "operator">, locale: Locale = "en"): string {
   const feature = getFeature(criterion.featureId, locale);
   if (!feature) return translate(locale, "Unassessed requirement");
+  if (feature.numericTarget && typeof criterion.value === "number") {
+    const operator = criterion.operator;
+    return isNumericComparisonOperator(operator)
+      ? translate(locale, {
+          gte: "Campaign length: at least {hours} hours",
+          near: "Campaign length: around {hours} hours",
+          lte: "Campaign length: at most {hours} hours",
+        }[operator], { hours: criterion.value })
+      : translate(locale, "Unassessed requirement");
+  }
   if (criterion.operator === "neq") {
     const label = typeof criterion.value === "boolean"
       ? getValueLabel(criterion.featureId, !criterion.value, locale)
@@ -113,5 +137,20 @@ export function getCriterionLabel(criterion: Pick<Criterion, "featureId" | "valu
 }
 
 export function isAllowedValue(featureId: string, value: unknown): value is CriterionValue {
-  return getFeature(featureId)?.options.some((option) => option.value === value) ?? false;
+  const feature = getFeature(featureId);
+  if (feature?.numericTarget) {
+    const { min, max } = feature.numericTarget;
+    return typeof value === "number" && Number.isInteger(value) && value >= min && value <= max;
+  }
+  return feature?.options.some((option) => option.value === value) ?? false;
+}
+
+export function isAllowedOperator(featureId: string, operator: unknown): operator is CriterionOperator {
+  return getFeature(featureId)?.numericTarget ? isNumericComparisonOperator(operator) : operator === "eq" || operator === "neq";
+}
+
+export function getAlternativeOptionKey({ featureId, value, operator }: AlternativeOption): string {
+  // Boolean features expose the same two choices whether phrased as include or exclude.
+  return JSON.stringify(typeof value === "boolean"
+    ? [featureId, operator === "eq" ? value : !value] : [featureId, value, operator]);
 }

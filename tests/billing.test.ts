@@ -4,7 +4,8 @@ import { billingEnvelope, BILLING_CONFIG } from "../server/billing.ts";
 import { maximumRequestChargeMicroUsd, PROVIDER_CONFIG } from "../server/provider.ts";
 import { RESERVATION_CENTS } from "../server/quota.ts";
 
-const CHECKED = Date.parse("2026-10-29T00:00:00+08:00");
+const REVIEW_DATE = "2026-11-09";
+const CHECKED = Date.parse(`${REVIEW_DATE}T00:00:00+08:00`);
 const CURRENT = CHECKED + 12 * 60 * 60 * 1000;
 
 test("confirmed USD uses the current provider envelope and matching three-cent unit", () => {
@@ -42,13 +43,13 @@ test("future-dated price or FX references fail closed before the Shanghai checke
     });
     assert.equal(billingEnvelope(currency, CHECKED).covered, true);
   }
-  assert.equal(PROVIDER_CONFIG.pricingCheckedDate, "2026-10-29");
-  assert.equal(BILLING_CONFIG.cnyPricingCheckedDate, "2026-10-29");
-  assert.equal(BILLING_CONFIG.fxCheckedDate, "2026-10-29");
+  assert.equal(PROVIDER_CONFIG.pricingCheckedDate, REVIEW_DATE);
+  assert.equal(BILLING_CONFIG.cnyPricingCheckedDate, REVIEW_DATE);
+  assert.equal(BILLING_CONFIG.fxCheckedDate, REVIEW_DATE);
 });
 
-test("the seven-day window matches the provider gate exactly and then expires", () => {
-  const expiry = CHECKED + BILLING_CONFIG.maxReferenceAgeMs;
+test("the refreshed references expire after seven Shanghai calendar days", () => {
+  const expiry = Date.parse("2026-11-16T00:00:00+08:00");
   for (const currency of ["USD", "CNY"] as const) {
     assert.equal(billingEnvelope(currency, expiry).covered, true);
     assert.deepEqual(billingEnvelope(currency, expiry + 1), {

@@ -15,13 +15,13 @@ export interface BillingEnvelope {
 export const BILLING_CONFIG = Object.freeze({
   // Peak cache-miss input/output: CNY 2 / 8 per million tokens, plus 10%.
   // https://api-docs.deepseek.com/zh-cn/quick_start/pricing/
-  cnyPricingCheckedDate: "2026-10-29",
+  cnyPricingCheckedDate: "2026-11-09",
   inputFenPerMillion: 220,
   outputFenPerMillion: 880,
-  // SAFE's 2026-10-29 reference: USD 100 = CNY 671.47 (6.7147 per USD).
+  // Reviewed the latest SAFE publication, dated 2026-11-09: CNY 6.7188 per USD.
   // https://www.safe.gov.cn/AppStructured/hlw/RMBQuery.do?COLLCC=546877760
   // Use a lower 6.0 floor rather than presenting a spot rate as an invoice.
-  fxCheckedDate: "2026-10-29",
+  fxCheckedDate: "2026-11-09",
   cnyPerUsdFloor: 6,
   maxReferenceAgeMs: 7 * 86_400_000,
 });

@@ -19,7 +19,7 @@ test("locale normalization and authored interpolation have safe readable fallbac
   for (const value of ["en", "fr", "", undefined, null, {}, ["zh"]]) assert.equal(normalizeLocale(value), "en");
   assert.equal(translate("zh", "Find games"), "寻找游戏");
   assert.equal(translate("en", "Find games"), "Find games");
-  assert.equal(translate("zh", "{count} matches · {possible} need checking", { count: 0, possible: 2 }), "0 款符合条件 · 2 款待确认");
+  assert.equal(translate("zh", "{count} ranked profiles · {possible} need checking", { count: 0, possible: 2 }), "0 款已排序 · 2 款待确认");
   assert.equal(translate("zh", "Unknown text {name}", { name: "value" }), "Unknown text value");
   assert.equal(translate("zh", "__proto__"), "__proto__");
 });
@@ -47,7 +47,8 @@ test("changing language changes explanations but not shortlist membership, order
   const query: SearchQuery = { criteria: [
     { id: "setting", featureId: "setting", value: "fantasy", importance: "must", weight: 1 },
     { id: "build", featureId: "progression", value: "class_based", importance: "preferred", weight: 3 },
-  ], excludedGameIds: ["中文exclude"], unhandledRequirements: ["Balance"] };
+  ], excludedGameIds: ["中文exclude"], unhandledRequirements: ["Balance"],
+    unresolvedRequirements: [{ id: "balance", sourceText: "Balance", importance: "preferred" }] };
   const before = structuredClone({ games, query });
   const en = matchGames(games, query, "en"), zh = matchGames(games, query, "zh");
   const outcomes = (groups: typeof en) => (["matches", "possible", "excluded"] as const).map(group => [group,

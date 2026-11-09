@@ -10,6 +10,8 @@ import { importLedgerSnapshot, validateLedgerSnapshot } from "../server/ledger-h
 import type { LedgerSnapshot } from "../server/ledger-handoff.ts";
 import { reserveAiCall } from "../server/quota.ts";
 import { submitFeedback, readFeedbackRequest, FeedbackError } from "../server/feedback.ts";
+import { BILLING_CONFIG } from "../server/billing.ts";
+import { PROVIDER_CONFIG } from "../server/provider.ts";
 import { aiRuntime } from "../server/runtime.ts";
 
 const NOW = new Date("2026-10-29T12:00:00Z");
@@ -160,26 +162,35 @@ test("trusted HTTPS feedback origin works behind an internal HTTP proxy and forw
   }
 });
 
-test("runtime cannot enable AI on an empty Node store or a spoofable ingress identity mode", () => {
+test("runtime requires a reconciled ledger, current billing references and browser-session identity", () => {
   const directory = mkdtempSync(path.join(os.tmpdir(), "atlas-runtime-test-"));
   const names = ["DATABASE_PATH", "AI_ENABLED", "AI_THROTTLE_SECRET", "DEEPSEEK_API_KEY", "AI_BILLING_CURRENCY", "AI_CLIENT_IDENTITY_MODE"];
   const previous = new Map(names.map(name => [name, process.env[name]]));
+  const referenceTimes = [PROVIDER_CONFIG.pricingCheckedDate, BILLING_CONFIG.cnyPricingCheckedDate, BILLING_CONFIG.fxCheckedDate]
+    .map(date => Date.parse(`${date}T00:00:00+08:00`));
+  const runtimeNow = Math.max(...referenceTimes);
+  const staleTime = Math.min(...referenceTimes) + BILLING_CONFIG.maxReferenceAgeMs + 1;
+  let store: SqliteStore | undefined;
   try {
     process.env.DATABASE_PATH = path.join(directory, "atlas.sqlite");
     process.env.AI_ENABLED = "true"; process.env.AI_THROTTLE_SECRET = "synthetic-secret-at-least-32-characters";
     process.env.DEEPSEEK_API_KEY = "synthetic-not-a-real-provider-key"; process.env.AI_BILLING_CURRENCY = "CNY";
     process.env.AI_CLIENT_IDENTITY_MODE = "browser-session";
-    assert.equal(aiRuntime(NOW.getTime()).enabled, false);
-    assert.equal(aiRuntime(NOW.getTime()).configurationCode, "LEDGER_HANDOFF_REQUIRED");
-    const store = configuredSqliteStore()!;
+    store = configuredSqliteStore();
+    assert.ok(store);
+    assert.equal(aiRuntime(runtimeNow).enabled, false);
+    assert.equal(aiRuntime(runtimeNow).configurationCode, "LEDGER_HANDOFF_REQUIRED");
     importLedgerSnapshot(store, fixture(), NOW.getTime());
-    assert.equal(aiRuntime(NOW.getTime()).enabled, true);
+    assert.equal(aiRuntime(runtimeNow).enabled, true);
+    const staleRuntime = aiRuntime(staleTime);
+    assert.equal(staleRuntime.enabled, false);
+    assert.equal(staleRuntime.configurationCode, "reference_stale");
     process.env.AI_CLIENT_IDENTITY_MODE = "sites-user";
-    assert.equal(aiRuntime(NOW.getTime()).enabled, false);
+    assert.equal(aiRuntime(runtimeNow).enabled, false);
     process.env.AI_CLIENT_IDENTITY_MODE = "cloudflare-ip";
-    assert.equal(aiRuntime(NOW.getTime()).enabled, false);
-    store.close();
+    assert.equal(aiRuntime(runtimeNow).enabled, false);
   } finally {
+    store?.close();
     for (const [name, value] of previous) { if (value === undefined) delete process.env[name]; else process.env[name] = value; }
     removeTestDirectory(directory);
   }

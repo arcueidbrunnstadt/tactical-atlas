@@ -1,5 +1,7 @@
 # Development roadmap
 
+**Current search work:** [Search and evidence design](SEARCH_DISCOVERY.md) defines the requirements, first duration-ranking slice and evaluation gates for bilingual discovery and niche visibility.
+
 **Current live release — 2 November 2026:** the independent Hong Kong host at [noctilucagame.com](https://noctilucagame.com/) serves the 24-game bilingual preview with editable criteria and exclusions, explained matching, source dossiers, comparison and account-free private feedback. [PR #5](https://github.com/arcueidbrunnstadt/tactical-atlas/pull/5) is merged; the runtime commit is `c52d5754972ad4ed4b4c98acbb71c796196a983c`. DeepSeek has passed small English/Chinese live checks; the original cumulative US$10 application allowance and SQLite ledger remain authoritative. These checks do not establish general interpretation quality.
 
 **Now live:**

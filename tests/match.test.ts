@@ -48,24 +48,24 @@ test("negative boolean preference matches explicit false, never mere absence", (
   assert.deepEqual(result.excluded.map((item) => item.game.id), ["yes"]);
 });
 
-test("avoid fantasy preserves categorical negation across supported and unknown records", () => {
+test("a different recorded setting leaves categorical negation unresolved", () => {
   const avoidFantasy: Criterion = { ...criterion("setting", "fantasy"), operator: "neq" };
   const result = matchGames([
     game("fantasy", { setting: facet("fantasy") }),
     game("scifi", { setting: facet("scifi") }),
     game("unknown", { setting: facet(null, "unknown") }),
   ], query([avoidFantasy]));
-  assert.deepEqual(result.matches.map((item) => item.game.id), ["scifi"]);
+  assert.deepEqual(result.matches, []);
   assert.deepEqual(result.excluded.map((item) => item.game.id), ["fantasy"]);
-  assert.deepEqual(result.possible.map((item) => item.game.id), ["unknown"]);
-  assert.equal(result.matches[0].reasons[0].label, "Setting: Exclude Fantasy");
+  assert.deepEqual(result.possible.map((item) => item.game.id), ["scifi", "unknown"]);
+  assert.equal(result.possible[0].reasons[0].label, "Setting: Exclude Fantasy");
 });
 
 test("soft categorical negation changes ordering without creating an exclusion", () => {
   const avoidFantasy: Criterion = { ...criterion("setting", "fantasy", "preferred"), operator: "neq" };
   const result = matchGames([
     game("fantasy", { setting: facet("fantasy") }),
-    game("scifi", { setting: facet("scifi") }),
+    game("scifi", { setting: { ...facet("scifi"), absentValues: [{ value: "fantasy", evidenceIds: [evidence.id] }] } }),
     game("unknown"),
   ], query([avoidFantasy]));
   assert.deepEqual(result.matches.map((item) => item.game.id), ["scifi", "unknown", "fantasy"]);
@@ -148,6 +148,27 @@ test("multiple recorded facet values can each match without modifying them", () 
   assert.deepEqual(record.facets.progression.value, ["class_based", "equipment"]);
 });
 
+test("a partial feature list cannot confirm that an unlisted feature is absent", () => {
+  const record = game("hybrid", { progression: facet(["class_based", "equipment"]) });
+  const exclusion: Criterion = { ...criterion("progression", "skill_based"), operator: "neq" };
+  assert.equal(evaluateCriterion(record, exclusion).status, "unknown");
+  assert.equal(evaluateCriterion(record, { ...exclusion, value: "equipment" }).status, "mismatch");
+});
+
+test("campaign targets grade shorter estimates, saturate at the target and retain unknowns", () => {
+  const target: Criterion = { ...criterion("campaign_hours", 50, "preferred", 3), operator: "gte" };
+  const withEstimate = (hours: number): GameRecord => ({
+    ...game(String(hours)),
+    campaignDuration: { kind: "approximate", lowerHours: hours, upperHours: hours, evidenceIds: [evidence.id] },
+  });
+  const bad = withEstimate(80);
+  bad.campaignDuration!.evidenceIds = ["missing"];
+  const result = matchGames([withEstimate(30), withEstimate(50), withEstimate(100), game("unknown"), bad], query([target]));
+  assert.deepEqual(result.matches.map(({ score, reasons }) => [score, reasons[0].status]),
+    [[6, "match"], [6, "match"], [2 * (30 / 50) * 3, "partial"], [0, "unknown"], [0, "unknown"]]);
+  assert.equal(result.excluded.length + result.possible.length, 0);
+});
+
 test("missing and dangling evidence are unresolved, not factual matches", () => {
   const record = game("broken", { positioning: { value: true, status: "source_supported", evidenceIds: ["missing"] } });
   assert.equal(evaluateCriterion(record, criterion("positioning", true)).status, "unknown");
@@ -201,9 +222,9 @@ test("duplicate game IDs fail visibly instead of returning duplicated recommenda
 });
 
 test("shared taxonomy exposes user-facing labels without unsupported quality guarantees", () => {
-  assert.equal(TAXONOMY_VERSION, "1.0");
+  assert.equal(TAXONOMY_VERSION, "1.5");
   assert.equal(getFeature("offline")?.label, "Offline play");
-  assert.match(getCriterionLabel(criterion("progression", "class_based")), /Class and ability choices/);
+  assert.match(getCriterionLabel(criterion("progression", "class_based")), /Class-based progression/);
   assert.equal(isAllowedValue("progression", "skill_based"), true);
   assert.equal(evaluateCriterion(game("skill-schools", { progression: facet(["skill_based"]) }), criterion("progression", "skill_based")).status, "match");
   assert.equal(getFeature("balanced"), undefined);
