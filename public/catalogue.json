@@ -31,6 +31,7 @@
     "storeUrl": "https://store.steampowered.com/app/1043810/",
     "editionScope": "Base Steam campaign; Special Edition extras are excluded from matching.",
     "summary": "Guide a team of modern-day wizards through authored tactical encounters, combining character-specific powers and revising plans.",
+    "campaignDuration": {"lowerHours": 14, "upperHours": 14, "kind": "approximate", "evidenceIds": ["TBW-duration"]},
     "facets": {
       "setting": {"value": ["fantasy", "contemporary"], "status": "source_supported", "evidenceIds": ["TBW-team"]},
       "structure": {"value": "squad", "status": "source_supported", "evidenceIds": ["TBW-team"]},
@@ -46,7 +47,8 @@
     "evidence": [
       {"id": "TBW-team", "statement": "The developer presents a wizard team uncovering a modern conspiracy in a story-led campaign.", "basis": "source_report", "url": "https://store.steampowered.com/app/1043810/", "locator": "About This Game opening; Get to Know These Loveable Idiots", "checkedDate": "2026-10-29", "limitations": ["Fantasy/contemporary describes the fictional setting, not realistic authenticity."]},
       {"id": "TBW-powers", "statement": "The description advertises spell combinations, character-specific abilities, perk upgrades, knockback and rewinds.", "basis": "source_report", "url": "https://store.steampowered.com/app/1043810/", "locator": "Combo Spells; Experiment Freely; Upgrade Your Magical Arsenal", "checkedDate": "2026-10-29", "limitations": ["Positioning relevance is an interpretation of the described knockback; balance remains unassessed."]},
-      {"id": "TBW-format", "statement": "We classify its handcrafted encounters and described shorter story campaign as a compact mission format.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1043810/", "locator": "About This Game opening; What Is It Not?", "checkedDate": "2026-10-29", "limitations": ["Format classification is provisional; no session length or working demo access is established."]}
+      {"id": "TBW-format", "statement": "We classify its handcrafted encounters and described shorter story campaign as a compact mission format.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1043810/", "locator": "About This Game opening; What Is It Not?", "checkedDate": "2026-10-29", "limitations": ["Format classification is provisional; no session length or working demo access is established."]},
+      {"id": "TBW-duration", "statement": "The developer's Steam description estimates about 14 hours for the base story campaign.", "basis": "source_report", "url": "https://store.steampowered.com/app/1043810/Tactical_Breach_Wizards/", "locator": "About This Game, opening campaign description", "checkedDate": "2026-11-08", "limitations": ["Play time varies by player. The Special Edition commentary section separately describes a 15-hour campaign."]}
     ]
   },
   {
@@ -135,7 +137,7 @@
       "setting": {"value": "fantasy", "status": "source_supported", "evidenceIds": ["BB-world"]},
       "structure": {"value": "company", "status": "source_supported", "evidenceIds": ["BB-world"]},
       "campaign": {"value": "open", "status": "source_supported", "evidenceIds": ["BB-world"]},
-      "progression": {"value": ["equipment", "skill_based"], "status": "source_supported", "evidenceIds": ["BB-development"]},
+      "progression": {"value": ["equipment", "skill_based"], "status": "source_supported", "evidenceIds": ["BB-development"], "absentValues": [{"value": "class_based", "evidenceIds": ["BB-development"]}]},
       "positioning": {"value": true, "status": "source_supported", "evidenceIds": ["BB-combat"]},
       "combos": {"value": true, "status": "source_supported", "evidenceIds": ["BB-combat"]},
       "narrative": {"value": null, "status": "unknown", "evidenceIds": []},
@@ -146,7 +148,7 @@
     "evidence": [
       {"id": "BB-world", "statement": "The store describes a medieval-fantasy mercenary company, a generated open world and player-chosen contracts.", "basis": "source_report", "url": "https://store.steampowered.com/app/365360/", "locator": "Short description; About This Game opening; world exploration and contracts", "checkedDate": "2026-10-29", "limitations": ["Medieval inspiration is not a historical-authenticity guarantee."]},
       {"id": "BB-combat", "statement": "The developer describes terrain and height, formation/equipment interactions, fatigue, morale and injuries.", "basis": "source_report", "url": "https://store.steampowered.com/app/365360/", "locator": "About This Game: battlefields; equipment; fatigue; injuries; wages and rations", "checkedDate": "2026-10-29", "limitations": ["No particular strategy's effectiveness was measured."]},
-      {"id": "BB-development", "statement": "The description explicitly replaces fixed classes with individual attributes, backgrounds, traits and perk-based development.", "basis": "source_report", "url": "https://store.steampowered.com/app/365360/", "locator": "About This Game: company fighters; class-based system paragraph", "checkedDate": "2026-10-29", "limitations": ["Character differentiation does not establish universal build viability."]}
+      {"id": "BB-development", "statement": "The description explicitly replaces fixed classes with individual attributes, backgrounds, traits and perk-based development.", "basis": "source_report", "url": "https://store.steampowered.com/app/365360/", "locator": "About This Game: company fighters; class-based system paragraph", "checkedDate": "2026-11-08", "limitations": ["Character differentiation does not establish universal build viability."]}
     ]
   },
   {
@@ -207,6 +209,7 @@
     "storeUrl": "https://store.steampowered.com/app/1850510/",
     "editionScope": "Base Steam game; the Deluxe Edition artbook is not a gameplay feature.",
     "summary": "A story-focused tactics RPG in which convictions and group votes shape the route, while terrain and coordinated attacks matter in battles.",
+    "campaignDuration": {"lowerHours": 30, "upperHours": 40, "kind": "range", "evidenceIds": ["TS-duration"]},
     "facets": {
       "setting": {"value": "fantasy", "status": "provisional", "evidenceIds": ["TS-world"]},
       "structure": {"value": "squad", "status": "source_supported", "evidenceIds": ["TS-combat"]},
@@ -222,7 +225,8 @@
     "evidence": [
       {"id": "TS-world", "statement": "The store describes fictional Norzelia, convictions, story paths and decisions resolved through allies' votes.", "basis": "source_report", "url": "https://store.steampowered.com/app/1850510/", "locator": "About This Game opening; Convictions; Voting", "checkedDate": "2026-10-29", "limitations": ["Fantasy is a provisional catalogue setting label; no historical-authenticity assessment is implied."]},
       {"id": "TS-combat", "statement": "The developer names terrain/elevation, distinctive party members, flanking follow-ups, coordinated abilities and character/weapon improvements.", "basis": "source_report", "url": "https://store.steampowered.com/app/1850510/", "locator": "Highly Strategic Battles; Converse With and Strengthen Your Allies", "checkedDate": "2026-10-29", "limitations": ["Strengthening a named character is not evidence of freeform class customization."]},
-      {"id": "TS-format", "statement": "We classify the described story battles and optional mock battles as a mission-oriented campaign.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1850510/", "locator": "Highly Strategic Battles; Encampment and Mental Mock Battles", "checkedDate": "2026-10-29", "limitations": ["A profile classification, not a measured campaign or session length."]}
+      {"id": "TS-format", "statement": "We classify the described story battles and optional mock battles as a mission-oriented campaign.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1850510/", "locator": "Highly Strategic Battles; Encampment and Mental Mock Battles", "checkedDate": "2026-10-29", "limitations": ["A profile classification, not a measured campaign or session length."]},
+      {"id": "TS-duration", "statement": "The developer comment accompanying Square Enix's 2022 post-purchase survey gives an expected 30–40 hours to reach one ending.", "basis": "source_report", "url": "https://www.jp.square-enix.com/trianglestrategy/enquete02/", "locator": "Play Time (プレイ時間), developer comment by Arai", "checkedDate": "2026-11-08", "limitations": ["The estimate refers to one route in the original Nintendo Switch release. It predates the Steam release and comes from the developer comment rather than the survey measurements."]}
     ]
   },
   {
@@ -232,6 +236,7 @@
     "storeUrl": "https://store.steampowered.com/app/1096530/",
     "editionScope": "Original Steam campaign; expansion classes, ancestries and campaigns are not assumed.",
     "summary": "Build a four-hero fantasy party and use tabletop-style rules, dice and three-dimensional terrain in tactical encounters.",
+    "campaignDuration": {"lowerHours": 30, "upperHours": 40, "kind": "range", "evidenceIds": ["SOL-duration"]},
     "facets": {
       "setting": {"value": "fantasy", "status": "source_supported", "evidenceIds": ["SOL-party"]},
       "structure": {"value": "party", "status": "source_supported", "evidenceIds": ["SOL-party"]},
@@ -247,7 +252,8 @@
     "evidence": [
       {"id": "SOL-party", "statement": "The developer describes a fantasy adventure with four created heroes, class/race choices and dialogue influenced by their personalities.", "basis": "source_report", "url": "https://store.steampowered.com/app/1096530/", "locator": "About This Game opening; An Epic Team Adventure", "checkedDate": "2026-10-29", "limitations": ["Specific expansion options are not included; narrative quality is unassessed."]},
       {"id": "SOL-environment", "statement": "The description names dice rolls, opportunity attacks, vertical positioning, light/darkness and destructible environmental objects.", "basis": "source_report", "url": "https://store.steampowered.com/app/1096530/", "locator": "Bring the Authentic Tabletop Gaming Experience; Discover a Mysterious and Dynamic World", "checkedDate": "2026-10-29", "limitations": ["No firsthand rules/implementation test was performed."]},
-      {"id": "SOL-format", "statement": "We infer a mission-oriented adventure with party-skill interactions from its dungeon and encounter descriptions.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1096530/", "locator": "An Epic Team Adventure; Discover a Mysterious and Dynamic World", "checkedDate": "2026-10-29", "limitations": ["Campaign format and combination relevance are provisional classifications."]}
+      {"id": "SOL-format", "statement": "We infer a mission-oriented adventure with party-skill interactions from its dungeon and encounter descriptions.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1096530/", "locator": "An Epic Team Adventure; Discover a Mysterious and Dynamic World", "checkedDate": "2026-10-29", "limitations": ["Campaign format and combination relevance are provisional classifications."]},
+      {"id": "SOL-duration", "statement": "Tactical Adventures estimated 30–40 hours for the original base campaign and said difficulty would affect play time.", "basis": "source_report", "url": "https://www.solasta-game.com/solasta-crown-of-the-magister/news/85-summer-qa-the-recap", "locator": "Summer Q&A – The Recap, Campaign & Quests, Q52", "checkedDate": "2026-11-08", "limitations": ["June 2020 prelaunch estimate for the base game. It covers the original campaign only. Actual times vary with difficulty."]}
     ]
   },
   {
@@ -257,6 +263,7 @@
     "storeUrl": "https://store.steampowered.com/app/1086940/",
     "editionScope": "Current base Steam offering; no mod-specific mechanics assumed.",
     "summary": "A fantasy party RPG combining class-based character creation, companion stories, consequential choices and environmental interaction.",
+    "campaignDuration": {"lowerHours": 80, "upperHours": null, "kind": "lower_bound", "evidenceIds": ["BG-duration"]},
     "facets": {
       "setting": {"value": "fantasy", "status": "source_supported", "evidenceIds": ["BG-party"]},
       "structure": {"value": "party", "status": "source_supported", "evidenceIds": ["BG-party"]},
@@ -272,7 +279,8 @@
     "evidence": [
       {"id": "BG-party", "statement": "The store describes a Dungeons and Dragons party RPG with class/race creation, Origin heroes and choice-responsive companion stories.", "basis": "source_report", "url": "https://store.steampowered.com/app/1086940/", "locator": "Short description; About This Game: character creation; Origin heroes", "checkedDate": "2026-10-29", "limitations": ["Build quality and narrative quality are not rated here."]},
       {"id": "BG-exploration", "statement": "We use an open-exploration label for its described experimentation and varied approaches within a narrative adventure.", "basis": "provisional_assessment", "url": "https://store.steampowered.com/app/1086940/", "locator": "About This Game: exploration and world interaction paragraphs", "checkedDate": "2026-10-29", "limitations": ["Does not mean the campaign is unrestricted or lacks progression boundaries."]},
-      {"id": "BG-combat", "statement": "The developer names vertical movement, shoving, environmental interactions, team initiative and modifiers; combination relevance is our interpretation.", "basis": "source_report", "url": "https://store.steampowered.com/app/1086940/", "locator": "About This Game: verticality; D&D 5e combat paragraph", "checkedDate": "2026-10-29", "limitations": ["Combination relevance is provisional; described dice modifiers are not a no-randomness promise."]}
+      {"id": "BG-combat", "statement": "The developer names vertical movement, shoving, environmental interactions, team initiative and modifiers; combination relevance is our interpretation.", "basis": "source_report", "url": "https://store.steampowered.com/app/1086940/", "locator": "About This Game: verticality; D&D 5e combat paragraph", "checkedDate": "2026-10-29", "limitations": ["Combination relevance is provisional; described dice modifiers are not a no-randomness promise."]},
+      {"id": "BG-duration", "statement": "Larian describes the main story path in the base game as taking more than 80 hours to complete.", "basis": "source_report", "url": "https://forums.larian.com/ubbthreads.php?Number=860777&ubb=showthreaded", "locator": "Community Update #21, A Cinematic Kaleidoscope", "checkedDate": "2026-11-08", "limitations": ["July 2023 prelaunch estimate with no upper bound stated. Actual completion time varies with route and play style."]}
     ]
   },
   {

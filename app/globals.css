@@ -28,6 +28,30 @@
 .text-input,.filter-panel select{font-size:13px;min-height:42px}
 .criterion legend,.filter-footnote,.unhandled p,.edition-scope,.table-caveat{font-size:12px}
 .criterion-options select,.criterion-value{min-height:42px}
+.duration-control{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.5}
+.duration-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:end;gap:8px}
+.duration-inputs label{display:grid;align-content:start;gap:4px}
+.duration-inputs input,.duration-inputs select{min-width:0;margin-top:0}
+.duration-control small{display:block;margin-top:5px;font-size:11px}
+.unhandled h3{font-size:13px;font-weight:650;margin-bottom:6px}
+.unresolved-editors{display:grid;gap:10px;margin-top:10px}
+.unresolved-editor{display:grid;gap:8px;min-width:0;border-top:1px solid #dcc69f;padding-top:10px}
+.unresolved-editor label{display:grid;gap:4px;font-size:12px;font-weight:600}
+.unresolved-editor textarea{width:100%;min-height:60px;resize:vertical;border:1px solid #94a18e;border-radius:3px;background:var(--surface);padding:8px 10px;font:400 16px/1.5 var(--sans)}
+.unresolved-editor select{min-height:44px}
+.unresolved-actions{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 10px}
+.unresolved-actions button{min-height:44px;font-size:12px;text-align:left}
+.unresolved-wording{overflow-wrap:anywhere}
+.alternative-group{min-width:0;display:grid;gap:8px}
+.alternative-group legend{font-weight:650;padding-inline:4px}
+.alternative-source,.alternative-or{font-size:12px;color:var(--muted);line-height:1.5}
+.alternative-options,.alternative-option{display:grid;gap:6px;min-width:0}
+.alternative-option-control{display:flex;align-items:center;gap:4px;min-width:0}
+.alternative-option-control select{min-width:0}
+.alternative-actions{display:flex;justify-content:space-between;flex-wrap:wrap;gap:0 8px}
+.alternative-actions .text-button{font-size:12px;min-height:40px;text-align:left}
+.alternative-group>.prioritize-button{padding-top:0;text-align:left}
+.unresolved-card-list{display:grid;gap:8px;list-style:none;margin:7px 0 0;padding:0;font-size:12px;line-height:1.6}
 .remove-button{width:42px;min-width:42px;min-height:42px}
 .prioritize-button,.exclusion-chip,.add-criterion{font-size:12px;min-height:40px}
 .compare-check{min-height:44px;padding:8px 0;display:inline-flex;align-items:center;gap:9px}

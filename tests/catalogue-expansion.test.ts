@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { evaluateCriterion, matchGames } from "../lib/match.ts";
-import { getFeature, isAllowedValue, TAXONOMY, TAXONOMY_VERSION } from "../lib/taxonomy.ts";
+import { CAMPAIGN_HOURS_FEATURE, getFeature, isAllowedValue, TAXONOMY, TAXONOMY_VERSION } from "../lib/taxonomy.ts";
 import type { Criterion, GameRecord } from "../lib/types.ts";
 import { interpretRequest, PROVIDER_CONFIG } from "../server/provider.ts";
 import type { ProviderFetch } from "../server/provider.ts";
@@ -30,7 +30,7 @@ function hard(featureId: string, value: Criterion["value"], operator: "eq" | "ne
 test("the expanded collection has at least 24 unique, source-linked profiles in the current vocabulary", () => {
   assert.ok(catalogue.length >= 24, "the approved first expansion must remain available");
   assert.equal(new Set(catalogue.map(game => game.id)).size, catalogue.length);
-  const featureIds = TAXONOMY.map(feature => feature.id).sort();
+  const featureIds = TAXONOMY.filter(feature => !feature.numericTarget).map(feature => feature.id).sort();
   for (const game of catalogue) {
     assert.match(game.id, /^steam_\d+$/);
     assert.ok(game.title.trim() && game.summary.trim() && game.editionScope.trim(), game.id);
@@ -51,11 +51,19 @@ test("the expanded collection has at least 24 unique, source-linked profiles in 
     for (const [featureId, facet] of Object.entries(game.facets)) {
       assert.ok(supportedStatuses.has(facet.status), game.id + "/" + featureId);
       assert.ok(facet.evidenceIds.every(id => evidenceIds.has(id)), game.id + "/" + featureId + " dangling evidence");
+      const values = Array.isArray(facet.value) ? facet.value : [facet.value];
+      const absent = facet.absentValues ?? [];
+      assert.equal(new Set(absent.map(({ value }) => value)).size, absent.length, game.id + "/" + featureId + " duplicate absence");
+      for (const claim of absent) {
+        assert.ok(typeof claim.value === "string" && isAllowedValue(featureId, claim.value));
+        assert.ok(!values.includes(claim.value), game.id + "/" + featureId + " conflicting absence");
+        assert.ok(claim.evidenceIds.length && claim.evidenceIds.every(id => game.evidence.some(item => item.id === id
+          && (item.basis === "source_report" || item.basis === "recorded_observation"))), game.id + "/" + featureId + " absence evidence");
+      }
       if (facet.status === "unknown") {
         assert.equal(facet.value, null, game.id + "/" + featureId + " unknown value");
         assert.deepEqual(facet.evidenceIds, [], game.id + "/" + featureId + " unknown evidence");
       } else {
-        const values = Array.isArray(facet.value) ? facet.value : [facet.value];
         assert.ok(values.length > 0 && values.every(value => isAllowedValue(featureId, value)), game.id + "/" + featureId + " value");
         assert.ok(facet.evidenceIds.length > 0, game.id + "/" + featureId + " unsupported assertion");
       }
@@ -65,6 +73,38 @@ test("the expanded collection has at least 24 unique, source-linked profiles in 
       assert.ok(note.evidenceIds.every(id => evidenceIds.has(id)), game.id + " note evidence");
     }
   }
+});
+
+test("the base Battle Brothers profile can satisfy a request to exclude class-based progression", () => {
+  const results = matchGames(catalogue, {
+    criteria: [hard("progression", "class_based", "neq")], excludedGameIds: [], unhandledRequirements: [],
+  }, "zh");
+  assert.deepEqual(results.matches.map(({ game }) => game.id), ["steam_365360"]);
+  assert.deepEqual(results.matches[0].reasons[0].evidenceIds, ["BB-development"]);
+  assert.match(results.matches[0].reasons[0].text, /没有基于职业的成长/);
+});
+
+test("campaign estimates link to source reports and only affect soft ranking", () => {
+  const sourced = catalogue.filter(game => game.campaignDuration);
+  assert.equal(sourced.length, 4);
+  for (const game of sourced) {
+    const estimate = game.campaignDuration!;
+    assert.ok(estimate.evidenceIds.length > 0);
+    assert.ok(estimate.evidenceIds.every(id => game.evidence.some(item => item.id === id && item.basis === "source_report")));
+  }
+  const target: Criterion = {
+    id: "duration", featureId: CAMPAIGN_HOURS_FEATURE, operator: "gte", value: 50, importance: "preferred", weight: 1,
+  };
+  const query = { criteria: [target], excludedGameIds: [], unhandledRequirements: [] };
+  const preferred = matchGames(catalogue, query, "zh");
+  assert.equal(preferred.matches.length, catalogue.length);
+  assert.equal(preferred.matches[0].game.id, "steam_1086940");
+  assert.match(preferred.matches[0].reasons[0].text, /至少 80 小时/);
+  assert.deepEqual(preferred.matches.slice(0, 5).map(item => item.reasons[0].status), ["match", "partial", "partial", "partial", "unknown"]);
+
+  const mandatory = matchGames(catalogue, { ...query, criteria: [{ ...target, importance: "must" }] });
+  assert.equal(mandatory.matches.length + mandatory.excluded.length, 0);
+  assert.equal(mandatory.possible.length, catalogue.length);
 });
 
 test("Chinese overlays cover every profile and align translated notes and evidence without replacing provenance", () => {

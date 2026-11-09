@@ -33,6 +33,8 @@ npm run build
 
 The live path sends only the request, the fixed vocabulary and catalogue identities to the provider. The model returns structured criteria and exclusions; application code validates them and matches the public JSON catalogue. Edits rerank without another model call. Result explanations resolve to profile evidence. Provisional judgments and unknowns do not establish a factual must-have pass.
 
+The current development version adds an editable minimum campaign length to the search criteria. Four base-campaign estimates support partial or full preference credit. The estimates leave mandatory playtime unresolved. See [search and evidence design](docs/SEARCH_DISCOVERY.md) for the requirements, scoring example and evaluation plan.
+
 The experimental catalogue includes games with turn-based tactical combat, including party RPGs. It is not a comprehensive library or a set of overall quality ratings. Store-reported mechanics are distinguished from provisional interpretation; current offline behavior is unassessed throughout the initial catalogue.
 
 ## Hosted API setup

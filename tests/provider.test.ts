@@ -2,12 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { createInterpretationJsonSchema, QueryValidationError, validateInterpretRequest, validateModelInterpretation } from "../lib/query-schema.ts";
+import { MAX_ALTERNATIVE_GROUPS, MAX_ALTERNATIVE_OPTIONS, TAXONOMY_VERSION } from "../lib/taxonomy.ts";
 import { interpretRequest, maximumRequestChargeMicroUsd, ProviderError, PROVIDER_CONFIG } from "../server/provider.ts";
 import type { InterpretRequestOptions, ProviderFetch } from "../server/provider.ts";
 
 const requestId = "123e4567-e89b-42d3-a456-426614174000";
 const catalogue = [{ id: "sample", title: "Sample Tactics", aliases: ["ST"] }];
-const base: InterpretRequestOptions = { apiKey: "unit-test-placeholder-never-live", query: "avoid fantasy; prefer skill choices", catalogue, taxonomyVersion: "1.0", requestId };
+const base: InterpretRequestOptions = { apiKey: "unit-test-placeholder-never-live", query: "avoid fantasy; prefer skill choices", catalogue, taxonomyVersion: TAXONOMY_VERSION, requestId };
 const model = {
   status: "ready", criteria: [
     { featureId: "setting", value: "fantasy", operator: "neq", importance: "must", weight: 1, sourceText: "avoid fantasy" },
@@ -54,18 +55,146 @@ test("valid interpretation preserves eq/neq, generates IDs and returns safe usag
   assert.equal(result.criteria[1].operator, "eq");
   assert.equal(result.criteria[0].id, `${requestId}:1`);
   assert.equal(result.criteria[0].sourceText, "avoid fantasy");
+  assert.deepEqual(result.alternatives, []);
   assert.deepEqual(result.usage, { inputTokens: 300, outputTokens: 100 });
   assert.equal(JSON.stringify(result).includes(base.apiKey), false);
 });
 
-test("structured schema requires every model field and bounds boolean-or-string values", () => {
+test("structured schema requires every model field and bounds supported values", () => {
   const schema = createInterpretationJsonSchema(catalogue) as { required: string[]; additionalProperties: boolean; properties: Record<string, any> };
   assert.equal(schema.additionalProperties, false);
-  assert.deepEqual(schema.required, ["status", "criteria", "excludedGameIds", "unhandledRequirements", "clarification"]);
+  assert.deepEqual(schema.required, ["status", "criteria", "excludedGameIds", "unhandledRequirements", "clarification", "alternatives"]);
   const criterion = schema.properties.criteria.items;
   assert.equal(criterion.additionalProperties, false);
   assert.equal(criterion.required.includes("id"), false);
-  assert.deepEqual(criterion.properties.value.anyOf.map((entry: { type: string }) => entry.type), ["string", "boolean"]);
+  assert.deepEqual(criterion.properties.value.anyOf.map((entry: { type: string }) => entry.type), ["string", "boolean", "integer"]);
+  assert.deepEqual(criterion.properties.value.anyOf[2], { type: "integer", minimum: 1, maximum: 300 });
+  const unresolved = schema.properties.unhandledRequirements.items;
+  assert.deepEqual(unresolved.required, ["sourceText", "importance"]);
+  assert.deepEqual(unresolved.properties.importance.enum, ["must", "preferred", "unknown"]);
+  const alternatives = schema.properties.alternatives;
+  assert.equal(alternatives.maxItems, MAX_ALTERNATIVE_GROUPS);
+  assert.equal(alternatives.items.additionalProperties, false);
+  assert.deepEqual(alternatives.items.required, ["options", "importance", "weight", "sourceText"]);
+  const options = alternatives.items.properties.options;
+  assert.equal(options.minItems, 2);
+  assert.equal(options.maxItems, MAX_ALTERNATIVE_OPTIONS);
+  assert.equal(options.items.additionalProperties, false);
+  assert.deepEqual(options.items.required, ["featureId", "value", "operator"]);
+  assert.deepEqual(options.items.properties.operator.enum, ["eq", "neq"]);
+  assert.equal(options.items.properties.featureId.enum.includes("campaign_hours"), false);
+});
+
+const settingOptions = [
+  { featureId: "setting", value: "fantasy", operator: "eq" },
+  { featureId: "setting", value: "scifi", operator: "eq" },
+];
+
+test("injected replies preserve a required alternative and its whole quote in both languages", async () => {
+  for (const query of ["The setting must be either fantasy or science fiction.", "题材必须是奇幻或科幻，满足其一即可。"]) {
+    const group = { options: settingOptions, sourceText: query, importance: "must", weight: 1 };
+    const upstream = fake(payload({ ...model, criteria: [], alternatives: [group] }));
+    const result = await interpretRequest({ ...base, query }, upstream.fetch);
+
+    assert.equal(upstream.calls(), 1);
+    assert.deepEqual(result.criteria, []);
+    assert.deepEqual(result.alternatives, [{ ...group, id: `${requestId}:alternatives:1` }]);
+  }
+});
+
+test("alternative validation rejects incomplete, duplicate and ungrounded options", () => {
+  const query = "The setting must be fantasy or science fiction. Positioning is also required.";
+  const sourceText = "The setting must be fantasy or science fiction.";
+  const group = { options: settingOptions, sourceText, importance: "must", weight: 1 };
+  const response = { ...model, criteria: [] };
+  const context = { ...base, query };
+  const requirePositioning = { ...model.criteria[0], featureId: "positioning", value: true, operator: "eq", sourceText: "Positioning is also required." };
+  for (const alternatives of [
+    null,
+    [{ ...group, options: [settingOptions[0]] }],
+    [{ ...group, options: [settingOptions[0], settingOptions[0]] }],
+    [{ ...group, options: [{ featureId: "offline", value: true, operator: "eq" }, { featureId: "offline", value: false, operator: "neq" }] }],
+    [{ ...group, options: [settingOptions[0], { ...settingOptions[1], value: true }] }],
+    [{ ...group, options: [settingOptions[0], { ...settingOptions[1], operator: "gte" }] }],
+    [{ ...group, options: [settingOptions[0], { featureId: "campaign_hours", value: 40, operator: "gte" }] }],
+    [{ ...group, options: [...settingOptions,
+      { featureId: "setting", value: "historical", operator: "eq" },
+      { featureId: "setting", value: "contemporary", operator: "eq" },
+      { featureId: "positioning", value: true, operator: "eq" },
+    ] }],
+    [{ ...group, sourceText: "I invented this choice." }],
+    [{ ...group, importance: "unknown" }],
+    [{ ...group, id: "model-supplied-id" }],
+    Array.from({ length: MAX_ALTERNATIVE_GROUPS + 1 }, () => group),
+  ]) {
+    assert.throws(() => validateModelInterpretation({ ...response, alternatives }, context), QueryValidationError);
+  }
+  assert.throws(() => validateModelInterpretation({
+    ...response, alternatives: [group], criteria: Array.from({ length: 8 }, () => requirePositioning),
+  }, context), QueryValidationError);
+});
+
+test("a shared quote cannot flatten distinct same-feature musts, while separate quotes preserve a conjunction", () => {
+  for (const [either, firstMust, secondMust] of [
+    ["The setting must be either fantasy or science fiction.", "Fantasy elements are required.", "Science fiction elements are also required."],
+    ["题材必须是奇幻或科幻，满足其一即可。", "必须有奇幻元素。", "也必须有科幻元素。"],
+  ]) {
+    const criteria = settingOptions.map((option) => ({ ...option, sourceText: either, importance: "must", weight: 1 }));
+    assert.throws(() => validateModelInterpretation({ ...model, criteria }, { ...base, query: either }), QueryValidationError);
+
+    const sourceTexts = [firstMust, secondMust];
+    const separate = criteria.map((criterion, index) => ({ ...criterion, sourceText: sourceTexts[index] }));
+    const result = validateModelInterpretation({ ...model, criteria: separate, alternatives: [] }, { ...base, query: sourceTexts.join(" ") });
+    assert.deepEqual(result.criteria.map(({ sourceText }) => sourceText), sourceTexts);
+    assert.deepEqual(result.alternatives, []);
+  }
+});
+
+test("injected unresolved conditions preserve their wording and priority in both languages", async () => {
+  for (const [required, preferred, unclear] of [
+    ["I must be able to save during combat.", "I prefer combat with no random hit rolls.", "What about voice acting?"],
+    ["必须能在战斗中存档。", "我更喜欢没有随机命中判定的战斗。", "有配音吗？"],
+  ]) {
+    const entries = [
+      { sourceText: required, importance: "must" },
+      { sourceText: preferred, importance: "preferred" },
+      { sourceText: unclear, importance: "unknown" },
+    ];
+    const response = { ...model, status: "unsupported", criteria: [], unhandledRequirements: entries };
+    const result = await interpretRequest({ ...base, query: [required, preferred, unclear].join(" ") }, fake(payload(response)).fetch);
+    assert.deepEqual(result.unhandledRequirements, [required, preferred, unclear]);
+    assert.deepEqual(result.unresolvedRequirements, entries.map((entry, index) =>
+      ({ ...entry, id: `${requestId}:unresolved:${index + 1}` })));
+  }
+});
+
+test("unresolved condition validation rejects invented wording and conflicting priorities", () => {
+  const sourceText = "I must be able to pause.";
+  const context = { ...base, query: sourceText };
+  const response = { ...model, status: "unsupported", criteria: [] };
+  for (const invalid of [
+    [{ sourceText: "I must be able to save.", importance: "must" }],
+    [{ sourceText }],
+    [{ sourceText, importance: "required" }],
+    [{ sourceText, importance: "must" }, { sourceText, importance: "preferred" }],
+  ]) {
+    assert.throws(() => validateModelInterpretation({ ...response, unhandledRequirements: invalid }, context), QueryValidationError);
+  }
+});
+
+test("an injected duration interpretation preserves the quoted numeric target in both languages", async () => {
+  for (const query of ["I prefer at least 50 hours to the story ending", "我希望主线至少有５０个小时"]) {
+    const criterion = { ...model.criteria[1], featureId: "campaign_hours", value: 50, operator: "gte", sourceText: query };
+    const response = { ...model, criteria: [criterion] };
+    const result = await interpretRequest({ ...base, query }, fake(payload(response)).fetch);
+    assert.equal(result.criteria[0].value, 50);
+    assert.equal(result.criteria[0].sourceText, query);
+    assert.equal(result.criteria[0].importance, "preferred");
+
+    for (const invalid of [{ value: 60 }, { value: 50.5 }, { operator: "eq" }, { featureId: "narrative" }]) {
+      assert.throws(() => validateModelInterpretation({ ...response, criteria: [{ ...criterion, ...invalid }] }, { ...base, query }), QueryValidationError);
+    }
+  }
 });
 
 test("the full public catalogue fits the fixed provider envelope", async () => {
@@ -200,20 +329,23 @@ test("Chinese source phrases survive validation without an invented English sour
 });
 
 test("focused clarification and unsupported requirements are preserved for the interface", () => {
-  const context = { query: "no randomness", taxonomyVersion: "1.0", requestId, catalogue };
+  const context = { query: "no randomness", taxonomyVersion: TAXONOMY_VERSION, requestId, catalogue };
   const result = validateModelInterpretation({ status: "clarification", criteria: [], excludedGameIds: [], unhandledRequirements: ["All randomness"], clarification: { question: "Which randomness do you want to avoid?", choices: ["Combat rolls", "All randomness"] } }, context);
   assert.equal(result.status, "clarification");
   assert.equal(result.unhandledRequirements[0], "All randomness");
+  assert.deepEqual(result.unresolvedRequirements, [
+    { id: `${requestId}:unresolved:1`, sourceText: "All randomness", importance: "unknown" },
+  ]);
   assert.equal(result.clarification?.choices.length, 2);
 });
 
 test("request validation rejects unexpected fields and unsupported UUIDs", () => {
-  assert.throws(() => validateInterpretRequest({ query: "fantasy", taxonomyVersion: "1.0", requestId, apiKey: "not-a-client-field" }), QueryValidationError);
-  assert.throws(() => validateInterpretRequest({ query: "fantasy", taxonomyVersion: "1.0", requestId: "anything" }), QueryValidationError);
+  assert.throws(() => validateInterpretRequest({ query: "fantasy", taxonomyVersion: TAXONOMY_VERSION, requestId, apiKey: "not-a-client-field" }), QueryValidationError);
+  assert.throws(() => validateInterpretRequest({ query: "fantasy", taxonomyVersion: TAXONOMY_VERSION, requestId: "anything" }), QueryValidationError);
 });
 
 test("too many hard requirements and contradictory ready requirements fail validation", () => {
-  const context = { query: base.query, taxonomyVersion: "1.0", requestId, catalogue };
+  const context = { query: base.query, taxonomyVersion: TAXONOMY_VERSION, requestId, catalogue };
   const must = model.criteria[0];
   assert.throws(() => validateModelInterpretation({ ...model, criteria: Array.from({ length: 9 }, () => must) }, context), QueryValidationError);
   assert.throws(() => validateModelInterpretation({ ...model, criteria: [must, { ...must, operator: "eq" }] }, context), QueryValidationError);
