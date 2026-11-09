@@ -8,6 +8,7 @@ export function nodeBindings() {
     ledgerHandoffReady: store?.handoffReady() ?? false,
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
     AI_ENABLED: process.env.AI_ENABLED,
+    AI_UTC_DAY_CALL_LIMIT: process.env.AI_UTC_DAY_CALL_LIMIT,
     AI_PROVIDER: process.env.AI_PROVIDER,
     AI_MODEL: process.env.AI_MODEL,
     AI_BILLING_CURRENCY: process.env.AI_BILLING_CURRENCY,

@@ -141,6 +141,15 @@ test("exact title and alias exclusions do not remove a sequel by prefix", () => 
   assert.equal(matchGames([original, sequel], query([], ["Example"])).matches.length, 2);
 });
 
+test("an exact canonical ID does not also exclude a game whose alias collides with it", () => {
+  const original = game("canonical-id", {}, "Original");
+  const different = game("different", {}, "Different title");
+  different.aliases = ["canonical-id"];
+  const result = matchGames([original, different], query([], ["canonical-id"]));
+  assert.deepEqual(result.excluded.map(({ game }) => game.id), ["canonical-id"]);
+  assert.deepEqual(result.matches.map(({ game }) => game.id), ["different"]);
+});
+
 test("multiple recorded facet values can each match without modifying them", () => {
   const record = game("hybrid", { progression: facet(["class_based", "equipment"]) });
   assert.equal(evaluateCriterion(record, criterion("progression", "class_based")).status, "match");

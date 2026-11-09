@@ -81,3 +81,15 @@ test("search and feedback failures use authored localized keys, never arbitrary 
   assert.doesNotMatch(feedbackErrorKey(arbitrary), /script|private/);
   assert.notEqual(translate("zh", feedbackErrorKey(arbitrary)), feedbackErrorKey(arbitrary));
 });
+
+test("search recovery explains invalid replies, timeouts and the manual path in both languages", () => {
+  for (const [code, english, chinese] of [
+    ["INVALID_RESPONSE", /could not be validated.*edit the criteria.*new search/, /未能通过校验.*手动调整.*重新发起搜索/],
+    ["PROVIDER_TIMEOUT", /edited manually/, /手动编辑/],
+    ["AI_CONNECTION_PENDING", /editable criteria/, /可编辑条件/],
+  ] as const) {
+    const key = searchErrorKey(code);
+    assert.match(translate("en", key), english, code);
+    assert.match(translate("zh", key), chinese, code);
+  }
+});

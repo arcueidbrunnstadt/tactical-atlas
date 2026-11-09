@@ -10,6 +10,7 @@ services:
       DATABASE_PATH: /data/atlas.sqlite
       APP_ORIGIN: https://${SITE_DOMAIN:?Set SITE_DOMAIN in deploy/.env}
       AI_ENABLED: ${AI_ENABLED:-false}
+      AI_UTC_DAY_CALL_LIMIT: ${AI_UTC_DAY_CALL_LIMIT-100}
       AI_PROVIDER: deepseek
       AI_MODEL: deepseek-flash
       AI_BILLING_CURRENCY: ${AI_BILLING_CURRENCY:-CNY}

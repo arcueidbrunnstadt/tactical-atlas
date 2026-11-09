@@ -8,10 +8,11 @@ import test from "node:test";
 import { SqliteStore, configuredSqliteStore } from "../server/sqlite-store.ts";
 import { importLedgerSnapshot, validateLedgerSnapshot } from "../server/ledger-handoff.ts";
 import type { LedgerSnapshot } from "../server/ledger-handoff.ts";
-import { reserveAiCall } from "../server/quota.ts";
+import { parseUtcDayCallLimit, reserveAiCall } from "../server/quota.ts";
 import { submitFeedback, readFeedbackRequest, FeedbackError } from "../server/feedback.ts";
 import { BILLING_CONFIG } from "../server/billing.ts";
-import { PROVIDER_CONFIG } from "../server/provider.ts";
+import { interpretRequest, ProviderError, PROVIDER_CONFIG, type ProviderFetch } from "../server/provider.ts";
+import { TAXONOMY_VERSION } from "../lib/taxonomy.ts";
 import { aiRuntime } from "../server/runtime.ts";
 
 const NOW = new Date("2026-10-29T12:00:00Z");
@@ -62,6 +63,31 @@ test("validated handoff preserves all four tables and duplicate import never ref
     assert.deepEqual(importLedgerSnapshot(store, snapshot, NOW.getTime() + 1000), { imported: false, alreadyImported: true, reservedCents: 24 });
     assert.equal(store.handoffReady(), true);
   } finally { store.close(); }
+});
+
+test("a rollout ceiling counts existing UTC-day reservations without rewriting the ledger limit", async () => {
+  const store = open();
+  try {
+    importLedgerSnapshot(store, fixture(), NOW.getTime());
+    const reserve = (limit: number, day = NOW) => reserveAiCall(store.database, randomUUID(), day, limit);
+    assert.equal((await reserve(10)).allowed, true);
+    assert.deepEqual(await reserve(10), { allowed: false, reason: "daily_limit" });
+    assert.deepEqual(await reserve(101), { allowed: false, reason: "quota_unavailable" });
+    assert.equal(store.sqlite.prepare("SELECT call_limit FROM ai_daily_usage").get()?.call_limit, 100);
+    store.sqlite.exec("UPDATE ai_daily_usage SET call_limit=10");
+    assert.deepEqual(await reserve(20), { allowed: false, reason: "daily_limit" });
+    assert.equal((await reserve(20, new Date("2026-10-30T00:00:00Z"))).allowed, true);
+    assert.equal(store.sqlite.prepare("SELECT reserved_cents FROM ai_trial_budget").get()?.reserved_cents, 27);
+    assert.equal(store.handoffReady(), true);
+  } finally { store.close(); }
+});
+
+test("rollout ceiling configuration defaults only when unset", () => {
+  assert.equal(parseUtcDayCallLimit(undefined), 100);
+  assert.equal(parseUtcDayCallLimit("20"), 20);
+  for (const value of ["", "0", "101", "-1", "1.5", "20 ", "2e1"]) {
+    assert.equal(parseUtcDayCallLimit(value), undefined);
+  }
 });
 
 test("handoff rejects extra/private fields, stale captures, malformed IDs and mismatched money/call counts", () => {
@@ -119,6 +145,50 @@ test("SQLite transactions preserve the final trial boundary under concurrent res
     await assert.rejects(store.batch([store.prepare("UPDATE ai_trial_budget SET reserved_cents=0"), store.prepare("INSERT INTO missing_table VALUES (1)")]));
     assert.equal(count(store, "ai_trial_budget"), before);
     assert.equal(store.sqlite.prepare("SELECT reserved_cents FROM ai_trial_budget").get()?.reserved_cents, 24);
+  } finally { store.close(); }
+});
+
+test("an invalid paid reply keeps its reservation and a fresh explicit search can recover", async () => {
+  const store = open();
+  const originalId = randomUUID();
+  const nextId = randomUUID();
+  const query = "I prefer a fantasy setting.";
+  const options = { apiKey: "synthetic-provider-key-never-live", query, taxonomyVersion: TAXONOMY_VERSION,
+    catalogue: [{ id: "sample", title: "Sample Tactics", aliases: [] }] };
+  const invalidText = "private malformed provider text";
+  let dispatched = 0;
+  const upstream: ProviderFetch = async () => {
+    dispatched += 1;
+    const text = dispatched === 1 ? invalidText : JSON.stringify({
+      status: "ready", alternatives: [], excludedGameIds: [], unhandledRequirements: [], clarification: null,
+      criteria: [{ featureId: "setting", value: "fantasy", operator: "eq", importance: "preferred", weight: 1, sourceText: query }],
+    });
+    return Response.json({ status: "completed", output: [{ type: "message", content: [{ type: "output_text", text }] }] });
+  };
+  try {
+    importLedgerSnapshot(store, fixture(), NOW.getTime());
+    const submit = async (requestId: string) => {
+      const reservation = await reserveAiCall(store.database, requestId, NOW);
+      return reservation.allowed ? interpretRequest({ ...options, requestId }, upstream) : reservation;
+    };
+
+    await assert.rejects(submit(originalId), (error) => error instanceof ProviderError && error.code === "INVALID_RESPONSE"
+      && !error.message.includes(invalidText));
+    assert.equal(dispatched, 1, "a failed reply must not trigger an automatic retry");
+    assert.equal(store.sqlite.prepare("SELECT reserved_cents FROM ai_trial_budget").get()?.reserved_cents, 24);
+
+    assert.deepEqual(await submit(originalId), { allowed: false, reason: "duplicate_request" });
+    assert.equal(dispatched, 1);
+    assert.equal(store.sqlite.prepare("SELECT reserved_cents FROM ai_trial_budget").get()?.reserved_cents, 24);
+
+    const recovered = await submit(nextId);
+    assert.ok("criteria" in recovered);
+    assert.equal(recovered.requestId, nextId);
+    assert.equal(recovered.criteria[0].value, "fantasy");
+    assert.equal(dispatched, 2);
+    assert.equal(store.sqlite.prepare("SELECT reserved_cents FROM ai_trial_budget").get()?.reserved_cents, 27);
+    assert.equal(store.sqlite.prepare("SELECT reserved_calls FROM ai_daily_usage").get()?.reserved_calls, 11);
+    assert.equal(store.handoffReady(), true);
   } finally { store.close(); }
 });
 

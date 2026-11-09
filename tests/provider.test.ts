@@ -45,7 +45,7 @@ test("valid interpretation preserves eq/neq, generates IDs and returns safe usag
     assert.equal(body.text.format.type, "json_schema");
     assert.equal(body.text.format.strict, undefined);
     assert.equal(body.text.format.name, "game_search_interpretation");
-    assert.deepEqual(body.text.format.schema, createInterpretationJsonSchema(catalogue));
+    assert.deepEqual(body.text.format.schema, createInterpretationJsonSchema());
     assert.equal(body.tools, undefined);
     assert.equal(String(init?.body).includes(base.apiKey), false);
   });
@@ -61,9 +61,10 @@ test("valid interpretation preserves eq/neq, generates IDs and returns safe usag
 });
 
 test("structured schema requires every model field and bounds supported values", () => {
-  const schema = createInterpretationJsonSchema(catalogue) as { required: string[]; additionalProperties: boolean; properties: Record<string, any> };
+  const schema = createInterpretationJsonSchema() as { required: string[]; additionalProperties: boolean; properties: Record<string, any> };
   assert.equal(schema.additionalProperties, false);
-  assert.deepEqual(schema.required, ["status", "criteria", "excludedGameIds", "unhandledRequirements", "clarification", "alternatives"]);
+  assert.deepEqual(schema.required, ["status", "criteria", "unhandledRequirements", "clarification", "alternatives"]);
+  assert.equal(schema.properties.excludedGameIds, undefined);
   const criterion = schema.properties.criteria.items;
   assert.equal(criterion.additionalProperties, false);
   assert.equal(criterion.required.includes("id"), false);
@@ -303,12 +304,28 @@ test("network and timeout errors are redacted and never automatically retried", 
   }
 });
 
-test("oversized visitor queries and serialized provider envelopes never dispatch", async () => {
+test("oversized visitor queries never dispatch", async () => {
   const upstream = fake(payload());
   await assert.rejects(interpretRequest({ ...base, query: "x".repeat(1_001) }, upstream.fetch), rejectsWith("QUERY_TOO_LARGE"));
-  const largeCatalogue = [{ id: "sample", title: "x".repeat(20_000), aliases: [] }];
-  await assert.rejects(interpretRequest({ ...base, catalogue: largeCatalogue }, upstream.fetch), rejectsWith("REQUEST_TOO_LARGE"));
   assert.equal(upstream.calls(), 0);
+});
+
+test("catalogue growth and aliases do not grow the provider request", async () => {
+  const larger = [...catalogue, ...Array.from({ length: 2_425 }, (_, i) => ({
+    id: `synthetic-${i}`, title: `Synthetic tactics ${i}`, aliases: [`测试条目 ${i}`],
+  }))];
+  const query = `${base.query}. Exclude 测试条目 2424.`;
+  const requests: string[] = [];
+  const upstream = fake(payload({ status: "ready", criteria: model.criteria, alternatives: [], unhandledRequirements: [], clarification: null }),
+    (_url, init) => requests.push(String(init?.body)));
+  const small = await interpretRequest({ ...base, query }, upstream.fetch);
+  const large = await interpretRequest({ ...base, query, catalogue: larger }, upstream.fetch);
+  assert.deepEqual(small.excludedGameIds, []);
+  assert.deepEqual(large.excludedGameIds, ["synthetic-2424"]);
+  assert.equal(requests.length, 2);
+  assert.equal(requests[0], requests[1]);
+  assert.doesNotMatch(requests[1], /Synthetic tactics|synthetic-2424/u);
+  assert.ok(new TextEncoder().encode(requests[1]).length <= PROVIDER_CONFIG.maxRequestBytes);
 });
 
 test("unsupported model/configuration, empty key and taxonomy drift never dispatch", async () => {

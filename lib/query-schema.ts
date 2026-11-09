@@ -2,9 +2,10 @@ import { CAMPAIGN_HOURS_FEATURE, CAMPAIGN_HOUR_TARGET, getAlternativeOptionKey, 
 import { hasDirectMechanicCue, managementScopeClauses, overlappingQuoteOffset, quoteIsWithin } from "./interpretation-grounding.ts";
 import { NUMERIC_COMPARISONS } from "./numeric-comparison.ts";
 import { quotesWholeHourTarget, readQuotedHourComparison } from "./quoted-comparison.ts";
+import { resolveTitleExclusions } from "./title-exclusions.ts";
 import type { AlternativeGroup, AlternativeOption, Criterion, CriterionOperator, GameRecord, SearchQuery, UnresolvedRequirement } from "./types.ts";
 
-export const INTERPRETATION_VERSION = "1.6";
+export const INTERPRETATION_VERSION = "1.7";
 export const MAX_QUERY_CHARACTERS = 1_000;
 export const MAX_QUERY_BYTES = 4 * 1024;
 const MAX_CONDITIONS_PER_PRIORITY = 8;
@@ -84,8 +85,10 @@ export function validateInterpretRequest(value: unknown): InterpretRequestBody {
   return { query: value.query.trim(), taxonomyVersion: value.taxonomyVersion, requestId: value.requestId };
 }
 
-const modelRootKeys = ["status", "criteria", "excludedGameIds", "unhandledRequirements", "clarification"] as const;
+const modelRootKeys = ["status", "criteria", "unhandledRequirements", "clarification"] as const;
 const currentModelRootKeys = [...modelRootKeys, "alternatives"] as const;
+const legacyModelRootKeys = [...modelRootKeys, "excludedGameIds"] as const;
+const legacyGroupedModelRootKeys = [...legacyModelRootKeys, "alternatives"] as const;
 const criterionKeys = ["featureId", "value", "operator", "importance", "weight", "sourceText"] as const;
 const alternativeKeys = ["options", "importance", "weight", "sourceText"] as const;
 const optionKeys = ["featureId", "value", "operator"] as const;
@@ -104,11 +107,13 @@ export function validateModelInterpretation(
   context: InterpretRequestBody & { catalogue: readonly CatalogueIdentity[] },
 ): ValidatedInterpretation {
   const invalid = (): never => { throw new QueryValidationError("INVALID_INTERPRETATION"); };
-  if (!record(value) || (!exactKeys(value, currentModelRootKeys) && !exactKeys(value, modelRootKeys))
+  if (!record(value) || (!exactKeys(value, currentModelRootKeys) && !exactKeys(value, legacyModelRootKeys)
+      && !exactKeys(value, legacyGroupedModelRootKeys))
       || !["ready", "clarification", "unsupported"].includes(String(value.status))
       || !Array.isArray(value.criteria) || value.criteria.length > MAX_REPRESENTED_CONDITIONS
-      || !Array.isArray(value.excludedGameIds) || value.excludedGameIds.length > context.catalogue.length
       || !Array.isArray(value.unhandledRequirements) || value.unhandledRequirements.length > MAX_MODEL_UNHANDLED) return invalid();
+  const modelExclusions = Object.hasOwn(value, "excludedGameIds") ? value.excludedGameIds : [];
+  if (!Array.isArray(modelExclusions) || modelExclusions.length > context.catalogue.length) return invalid();
 
   const criteria: InterpretedCriterion[] = [];
   for (const [index, candidate] of value.criteria.entries()) {
@@ -169,8 +174,29 @@ export function validateModelInterpretation(
       && criteria.slice(index + 1).some((other) => other.importance === "must" && other.operator === "eq"
         && item.featureId === other.featureId && item.value !== other.value && item.sourceText === other.sourceText))) return invalid();
 
-  const allowedIds = new Set(context.catalogue.map((game) => game.id));
-  if (!value.excludedGameIds.every((id) => typeof id === "string" && allowedIds.has(id))) return invalid();
+  // Older provider replies can still be replayed, but never decide which titles disappear.
+  if (modelExclusions.length) {
+    const allowedIds = new Set(context.catalogue.map((game) => game.id));
+    if (!modelExclusions.every((id) => typeof id === "string" && allowedIds.has(id))) return invalid();
+  }
+  const titleExclusions = resolveTitleExclusions(context.query, context.catalogue);
+  const excludedGameIds = [...new Set(titleExclusions.flatMap(({ gameIds }) => gameIds))];
+  const trimTitleWording = (quote: string) => quote.trim().replace(/[.!?;。！？；]+$/u, "").trimEnd();
+  const belongsToTitleExclusion = (quote: string) => {
+    const text = trimTitleWording(quote);
+    return text && titleExclusions.some(({ sourceText }) => quoteIsWithin(context.query, text, sourceText));
+  };
+  const crossesTitleExclusion = (quote: string) => {
+    const text = trimTitleWording(quote);
+    return text && titleExclusions.some(({ sourceText }) => {
+      for (let start = context.query.indexOf(sourceText); start >= 0; start = context.query.indexOf(sourceText, start + 1)) {
+        const end = start + sourceText.length;
+        const offset = overlappingQuoteOffset(context.query, text, start, end);
+        if (offset >= 0 && (offset < start || offset + text.length > end)) return true;
+      }
+      return false;
+    });
+  };
 
   const unresolved = new Map<string, UnresolvedRequirement>();
   const structuredQuotes = new Set<string>();
@@ -186,13 +212,19 @@ export function validateModelInterpretation(
         && isUnresolvedPriority(item.importance)) {
       sourceText = item.sourceText;
       importance = item.importance;
-      structuredQuotes.add(sourceText);
     } else {
       return invalid();
     }
+    if (belongsToTitleExclusion(sourceText)) continue;
+    if (record(item)) structuredQuotes.add(sourceText);
     const previous = unresolved.get(sourceText);
     if (previous && previous.importance !== importance) return invalid();
     if (!previous) unresolved.set(sourceText, {
+      id: `${context.requestId}:unresolved:${unresolved.size + 1}`, sourceText, importance,
+    });
+  }
+  for (const { sourceText, gameIds, importance } of titleExclusions) {
+    if (!gameIds.length && !unresolved.has(sourceText)) unresolved.set(sourceText, {
       id: `${context.requestId}:unresolved:${unresolved.size + 1}`, sourceText, importance,
     });
   }
@@ -207,7 +239,7 @@ export function validateModelInterpretation(
     clarification = { question: value.clarification.question, choices: [...value.clarification.choices] };
   }
   if ((value.status === "clarification") !== (clarification !== null)) return invalid();
-  if (value.status === "unsupported" && value.unhandledRequirements.length === 0) return invalid();
+  if (value.status === "unsupported" && value.unhandledRequirements.length === 0 && !titleExclusions.length) return invalid();
 
   // A model must ask for clarification rather than pretending contradictory musts are ready.
   if (value.status === "ready") {
@@ -235,45 +267,78 @@ export function validateModelInterpretation(
     return false;
   };
   const managementScopes = managementScopeClauses(context.query);
-  const retainedScopes = new Set<string>();
+  const requiredScopes = managementScopes.filter(({ required }) => required);
+  const requiredGroups: { scopeStart: number; start: number; end: number }[] = [];
   const guardManagementScope = (item: Pick<InterpretedCriterion, "sourceText" | "importance">,
     includesStructure: boolean, grouped = false) => {
     for (const scope of managementScopes) {
       if (!includesStructure && !scope.conditional) continue;
       const offset = overlappingQuoteOffset(context.query, item.sourceText, scope.start, scope.end);
       if (offset < 0) continue;
-      const wording = grouped ? context.query.slice(Math.min(offset, scope.start), Math.max(offset + item.sourceText.length, scope.end))
-        : scope.sourceText;
-      keepRepresented({ sourceText: wording, importance: scope.required ? "must" : item.importance }, false);
-      retainedScopes.add(scope.sourceText);
+      const start = Math.min(offset, scope.start);
+      const end = Math.max(offset + item.sourceText.length, scope.end);
+      if (!scope.required) {
+        const wording = grouped ? context.query.slice(start, end) : scope.sourceText;
+        keepRepresented({ sourceText: wording, importance: item.importance }, false);
+      } else if (grouped) {
+        requiredGroups.push({ scopeStart: scope.start, start, end });
+      }
       return false;
     }
     return true;
   };
   const representedCriteria = criteria.filter((item) => {
-    if (!guardManagementScope(item, item.featureId === "structure")) return false;
+    if (belongsToTitleExclusion(item.sourceText) || !guardManagementScope(item, item.featureId === "structure")) return false;
+    if (crossesTitleExclusion(item.sourceText)) return keepRepresented(item, false);
     if (item.featureId === CAMPAIGN_HOURS_FEATURE) {
       const comparison = readQuotedHourComparison(context.query, item.sourceText);
       return keepRepresented(item, comparison.operator === item.operator, comparison.wording);
     }
     return keepRepresented(item, hasDirectMechanicCue(item.featureId, item.sourceText));
   });
-  const representedAlternatives = alternatives.filter((item) => guardManagementScope(item, item.options.some(({ featureId }) => featureId === "structure"), true)
-    && keepRepresented(item, item.options.every(({ featureId }) => hasDirectMechanicCue(featureId, item.sourceText))));
-  // Recognized explicit requirements also survive a reply that silently omits them.
-  const requiredScopes = managementScopes.filter(({ required }) => required);
-  for (const { sourceText } of requiredScopes) {
-    if (!retainedScopes.has(sourceText)) keepRepresented({ sourceText, importance: "must" }, false);
+  const representedAlternatives = alternatives.filter((item) => !belongsToTitleExclusion(item.sourceText)
+    && guardManagementScope(item, item.options.some(({ featureId }) => featureId === "structure"), true)
+    && keepRepresented(item, !crossesTitleExclusion(item.sourceText)
+      && item.options.every(({ featureId }) => hasDirectMechanicCue(featureId, item.sourceText))));
+  const represented = [...representedCriteria, ...representedAlternatives];
+  const trimBoundaries = (text: string) => text.replace(/^[\s.!?;。！？；]+|[\s.!?;。！？；]+$/gu, "");
+  const isRepresented = (outside: string) => {
+    const text = trimBoundaries(outside);
+    return !text || represented.some(({ sourceText }) => quoteIsWithin(context.query, text, sourceText));
+  };
+  let nextNote = unresolved.size + 1;
+  for (const scope of requiredScopes) {
+    // Keep a grouped branch beyond this clause unless a separate retained
+    // condition already covers its wording. Otherwise use the exact clause.
+    const wordings = requiredGroups.filter(({ scopeStart, start, end }) => scopeStart === scope.start
+      && ![context.query.slice(start, scope.start), context.query.slice(scope.end, end)].every(isRepresented))
+      .map(({ start, end }) => context.query.slice(start, end));
+    if (wordings.length === 0) wordings.push(scope.sourceText);
+
+    for (const quote of unresolved.keys()) {
+      const text = trimBoundaries(quote);
+      if (!text || wordings.includes(quote)) continue;
+      const offset = overlappingQuoteOffset(context.query, quote, scope.start, scope.end);
+      const redundantOverhang = offset >= 0 && context.query.indexOf(quote) === context.query.lastIndexOf(quote)
+        && [context.query.slice(offset, scope.start), context.query.slice(scope.end, offset + quote.length)].every(isRepresented);
+      if (redundantOverhang || quoteIsWithin(context.query, text, scope.sourceText)) unresolved.delete(quote);
+    }
+    for (const sourceText of new Set(wordings)) {
+      const id = unresolved.get(sourceText)?.id ?? `${context.requestId}:unresolved:${nextNote++}`;
+      unresolved.set(sourceText, { id, sourceText, importance: "must" });
+    }
   }
   if (unresolved.size > MAX_RETURNED_UNRESOLVED_REQUIREMENTS) return invalid();
-  const status = value.status === "ready" && (conditions.length > 0 || requiredScopes.length > 0) && !representedCriteria.length
-    && !representedAlternatives.length && !value.excludedGameIds.length ? "unsupported" : value.status as ValidatedInterpretation["status"];
+  let status = value.status as ValidatedInterpretation["status"];
+  if (status === "unsupported" && excludedGameIds.length) status = "ready";
+  if (status === "ready" && !represented.length && !excludedGameIds.length
+      && (conditions.length || requiredScopes.length || titleExclusions.length || modelExclusions.length)) status = "unsupported";
 
   return {
     status,
     criteria: representedCriteria,
     alternatives: representedAlternatives,
-    excludedGameIds: [...new Set(value.excludedGameIds as string[])],
+    excludedGameIds,
     unhandledRequirements: [...unresolved.keys()],
     unresolvedRequirements: [...unresolved.values()],
     clarification,
@@ -284,7 +349,7 @@ export function validateModelInterpretation(
 }
 
 /** A provider-compatible strict schema. Feature/value compatibility is checked above. */
-export function createInterpretationJsonSchema(catalogue: readonly CatalogueIdentity[]): Record<string, unknown> {
+export function createInterpretationJsonSchema(): Record<string, unknown> {
   const stringValues = [...new Set(TAXONOMY.flatMap((feature) => feature.options
     .map((option) => option.value).filter((item): item is string => typeof item === "string")))];
   const categoricalValues = [{ type: "string", enum: stringValues }, { type: "boolean" }];
@@ -331,7 +396,6 @@ export function createInterpretationJsonSchema(catalogue: readonly CatalogueIden
           },
         },
       },
-      excludedGameIds: { type: "array", maxItems: catalogue.length, items: { type: "string", enum: catalogue.map((game) => game.id) } },
       unhandledRequirements: {
         type: "array", maxItems: MAX_MODEL_UNHANDLED,
         items: {

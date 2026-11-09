@@ -121,6 +121,25 @@ test("transport failures reveal neither exception details nor key and have no au
   assert.equal(calls, 1);
 });
 
+test("a later explicit metadata check recovers after a cached account failure expires", async () => {
+  resetProviderAccountCache();
+  let clock = 1000;
+  let calls = 0;
+  const upstream = async () => {
+    calls += 1;
+    return calls === 1 ? new Response(null, { status: 503 }) : Response.json(account("CNY"));
+  };
+
+  assert.deepEqual(await checkProviderAccount(KEY, "CNY", upstream, () => clock), { ready: false, code: "PROVIDER_UNAVAILABLE" });
+  clock = 60_999;
+  assert.deepEqual(await checkProviderAccount(KEY, "CNY", upstream, () => clock), { ready: false, code: "PROVIDER_UNAVAILABLE" });
+  assert.equal(calls, 1);
+
+  clock = 61_000;
+  assert.deepEqual(await checkProviderAccount(KEY, "CNY", upstream, () => clock), { ready: true, code: "READY", currency: "CNY" });
+  assert.equal(calls, 2);
+});
+
 test("metadata dispatch is given an eight-second deadline", async () => {
   resetProviderAccountCache();
   const originalTimeout = AbortSignal.timeout;

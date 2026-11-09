@@ -9,6 +9,11 @@ export const TRIAL_LIMIT_CENTS = 1000;
 export const RESERVATION_CENTS = 3;
 export const UTC_DAY_CALL_LIMIT = 100;
 
+export function parseUtcDayCallLimit(value: string | undefined): number | undefined {
+  if (value === undefined) return UTC_DAY_CALL_LIMIT;
+  if (/^[1-9]\d{0,2}$/.test(value) && Number(value) <= UTC_DAY_CALL_LIMIT) return Number(value);
+}
+
 const TRIAL_ID = "public-preview-trial";
 const CONFIG_VERSION = "deepseek-v1";
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -45,11 +50,13 @@ export async function reserveAiCall(
   db: QuotaDatabase | undefined,
   requestId: string,
   now: Date = new Date(),
+  utcDayCallLimit = UTC_DAY_CALL_LIMIT,
 ): Promise<QuotaReservation> {
   if (typeof requestId !== "string" || !UUID_V4.test(requestId)) {
     return { allowed: false, reason: "invalid_request_id" };
   }
-  if (!db || !Number.isFinite(now.getTime())) {
+  if (!db || !Number.isFinite(now.getTime()) || !Number.isInteger(utcDayCallLimit)
+    || utcDayCallLimit < 1 || utcDayCallLimit > UTC_DAY_CALL_LIMIT) {
     return { allowed: false, reason: "quota_unavailable" };
   }
 
@@ -83,7 +90,7 @@ export async function reserveAiCall(
           AND EXISTS (SELECT 1 FROM ai_daily_usage
             WHERE day_key = ? AND reserved_calls < MIN(call_limit, ?))`)
         .bind(RESERVATION_CENTS, id, ownerNonce, TRIAL_ID,
-          RESERVATION_CENTS, TRIAL_LIMIT_CENTS, dayKey, UTC_DAY_CALL_LIMIT),
+          RESERVATION_CENTS, TRIAL_LIMIT_CENTS, dayKey, utcDayCallLimit),
       db.prepare(`UPDATE ai_trial_budget
         SET reserved_cents = reserved_cents + ?
         WHERE id = ? AND EXISTS (SELECT 1 FROM ai_call_reservations
@@ -105,7 +112,7 @@ export async function reserveAiCall(
           ELSE 'quota_unavailable' END
         WHERE request_id = ? AND owner_nonce = ? AND state = 'pending'`)
         .bind(TRIAL_ID, RESERVATION_CENTS, TRIAL_LIMIT_CENTS,
-          dayKey, UTC_DAY_CALL_LIMIT, id, ownerNonce),
+          dayKey, utcDayCallLimit, id, ownerNonce),
       db.prepare(`SELECT owner_nonce, state, reserved_cents, denial_reason
         FROM ai_call_reservations WHERE request_id = ?`)
         .bind(id),

@@ -1,11 +1,12 @@
 import { nodeBindings } from "./node-env.ts";
 import { PROVIDER_CONFIG } from "./provider.ts";
 import { billingEnvelope } from "./billing.ts";
-import type { QuotaDatabase } from "./quota.ts";
+import { parseUtcDayCallLimit, type QuotaDatabase } from "./quota.ts";
 
 type RuntimeBindings = {
   DEEPSEEK_API_KEY?: string;
   AI_ENABLED?: string;
+  AI_UTC_DAY_CALL_LIMIT?: string;
   AI_PROVIDER?: string;
   AI_MODEL?: string;
   AI_BILLING_CURRENCY?: string;
@@ -22,6 +23,7 @@ export function aiRuntime(now = Date.now()) {
   const provider = bindings.AI_PROVIDER || PROVIDER_CONFIG.provider;
   const model = bindings.AI_MODEL || PROVIDER_CONFIG.model;
   const billing = billingEnvelope(bindings.AI_BILLING_CURRENCY, now);
+  const utcDayCallLimit = parseUtcDayCallLimit(bindings.AI_UTC_DAY_CALL_LIMIT);
   const throttleSecret = bindings.AI_THROTTLE_SECRET;
   const identityMode = bindings.AI_CLIENT_IDENTITY_MODE || "browser-session";
   const throttleConfigured = typeof throttleSecret === "string" && throttleSecret.length >= 32
@@ -30,9 +32,9 @@ export function aiRuntime(now = Date.now()) {
     && provider === PROVIDER_CONFIG.provider && model === PROVIDER_CONFIG.model
     && throttleConfigured;
   const configured = accountCheckConfigured && billing.covered && billing.currency !== null && bindings.ledgerHandoffReady === true;
-  const enabled = bindings.AI_ENABLED === "true" && configured;
+  const enabled = bindings.AI_ENABLED === "true" && configured && utcDayCallLimit !== undefined;
   return { enabled, configured, accountCheckConfigured, key, provider, model, billingCurrency: billing.currency,
     configurationCode: !billing.covered ? billing.reason : !bindings.ledgerHandoffReady ? "LEDGER_HANDOFF_REQUIRED" : "CONFIGURATION_PENDING",
-    throttleSecret, identityMode, db: bindings.DB,
+    throttleSecret, identityMode, utcDayCallLimit, db: bindings.DB,
     reason: enabled ? "ready" : "Live AI connection pending" };
 }

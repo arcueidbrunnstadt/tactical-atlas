@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     if (!runtime.billingCurrency) return reply({ code: "BILLING_CURRENCY_MISSING", message: "Live AI configuration is pending. Manual requirements are available." }, 503, sessionCookie);
     const account = await checkProviderAccount(runtime.key, runtime.billingCurrency);
     if (!account.ready) return reply({ code: account.code, message: "Live AI setup needs attention. You can still explore and edit criteria manually." }, 503, sessionCookie);
-    const reservation = await reserveAiCall(runtime.db, body.requestId);
+    const reservation = await reserveAiCall(runtime.db, body.requestId, undefined, runtime.utcDayCallLimit);
     if (!reservation.allowed) return reply({ code: reservation.reason, message: reservation.reason === "duplicate_request"
       ? "This request was already submitted. Edit criteria manually, or make a new explicit search."
       : "Live AI is temporarily unavailable under this preview's usage allowance. Browsing and editable criteria still work." }, reservation.reason === "duplicate_request" ? 409 : 429, sessionCookie);

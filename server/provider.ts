@@ -103,7 +103,7 @@ export function maximumRequestChargeMicroUsd(): number {
     + PROVIDER_CONFIG.maxOutputTokens * PROVIDER_CONFIG.outputMicroUsdPerMillion) / 1_000_000);
 }
 
-function instructions(catalogue: readonly CatalogueIdentity[]): string {
+function instructions(): string {
   const vocabulary = TAXONOMY.map((feature) => ({
     featureId: feature.id, label: feature.label,
     ...(feature.numericTarget
@@ -116,22 +116,21 @@ function instructions(catalogue: readonly CatalogueIdentity[]): string {
     "Return only the specified structured object. Use supported feature/value pairs from the vocabulary. Copy each criterion's sourceText exactly from the visitor text, preserving its language and casing.",
     "Preserve exclusions and negation: eq means include the value, neq means avoid the value. Use must only for explicit requirements/exclusions; ordinary desires are preferred. Weight is 1 unless the visitor explicitly prioritizes a preference, when it may be 3.",
     "Use campaign_hours for one base-campaign target to a story ending. gte is an explicit minimum ('at least 35 hours' / '至少35小时'), near is approximate ('around 35 hours' / '大约35小时'), and lte is an explicit maximum ('at most 35 hours' / '最多35小时'). Quote the exact whole-hour number, its comparison and its scope together. Preserve priority. Vague lengths, ranges, exact equality, strict inequalities, DLC, completionist and session lengths stay unresolved.",
-    "Use at most eight must and eight preferred conditions, counting each alternatives group once. Explicitly excluded catalogue games go in excludedGameIds using exact IDs. Never invent IDs or exclude a sequel by prefix.",
+    "Use at most eight must and eight preferred conditions, counting each alternatives group once. For explicit requests to exclude named games, copy the full exclusion clause to unhandledRequirements with importance must. The application resolves exact titles. Do not supply title IDs or infer mechanics from a game name.",
     "Use alternatives for a condition satisfied by any one of 2–4 simple eq/neq options, e.g. fantasy or science fiction. Quote the whole choice on the group and set its priority and weight once. Keep standalone criteria as separate conditions with individual source quotes. If an option is unsupported or requires several clauses, keep the whole choice unresolved instead of flattening or dropping an option.",
     "Put each unsupported or unresolved condition in unhandledRequirements as an object with verbatim sourceText and importance. Quote enough wording to preserve the condition and its scope. Use must for a requirement, preferred for a preference, and unknown if its priority is unclear. Never drop or downgrade a must because the vocabulary lacks it. Overall balance, depth, authenticity, exact play-session guarantees and no grinding are unsupported.",
     "Each criterion needs a quote directly expressing its feature and value. Structure describes what players manage; it cannot show that company upkeep is compulsory, can be skipped, or that one squad is enough. Keep the full unsupported condition unresolved, including any conditional branches. Keep independent supported requirements and preferences as separate criteria with their own quotes. A phrase like 'either way' or '无论如何' that makes a preference apply in every case does not create an either/or group.",
     "Positioning means the placement of units matters, e.g. 'positioning matters' or '重视走位'. Seeing enemy intentions before committing is an information and timing requirement; keep it unhandled, even if it mentions movement or positioning.",
     "Combos means abilities that interact, combine or have synergies, e.g. 'interacting abilities' or '技能联动'. Merely mentioning abilities or class choices does not request combos. Overall balance and depth have no proxy. Only map explicitly stated mechanics or progression choices alongside those judgments.",
     "Ask one focused clarification only when musts conflict or materially different meanings of the visitor's words would change the search. For 'no randomness', ask whether the visitor means combat hit/miss rolls, generation or all randomness. A clear condition the vocabulary cannot assess stays unresolved without a clarification.",
-    "Reference-game comparisons may use only traits explicitly named by the visitor. The catalogue list contains identities, not mechanics. For an unprofiled reference or an unexplained 'like X', ask which trait matters rather than inventing facts from memory.",
+    "Reference-game comparisons may use only traits explicitly named by the visitor. For an unexplained 'like X', ask which trait matters rather than inventing facts from memory.",
     "Use status clarification with a question and two to four choices in the visitor's language; otherwise clarification is null. Include the affected condition in unhandledRequirements when clarifying it. When no clarification is needed, use ready if a supported criterion, alternatives group or title exclusion remains, even with unresolved conditions. Use unsupported when none remain.",
     `Vocabulary: ${JSON.stringify(vocabulary)}`,
-    `Catalogue identities: ${JSON.stringify(catalogue.map(({ id, title, aliases }) => ({ id, title, aliases })))}`,
   ].join("\n");
 }
 
 function validatedCatalogue(catalogue: readonly CatalogueIdentity[]): void {
-  if (!Array.isArray(catalogue) || catalogue.length === 0 || catalogue.length > 50) throw configurationError();
+  if (!Array.isArray(catalogue) || catalogue.length === 0) throw configurationError();
   const ids = new Set<string>();
   for (const game of catalogue) {
     if (!game || typeof game.id !== "string" || !game.id.trim() || typeof game.title !== "string" || !game.title.trim()
@@ -238,9 +237,9 @@ export async function interpretRequest(
     stream: false,
     tool_choice: "none",
     max_output_tokens: PROVIDER_CONFIG.maxOutputTokens,
-    instructions: instructions(options.catalogue),
+    instructions: instructions(),
     input: request.query,
-    text: { format: { type: "json_schema", name: "game_search_interpretation", schema: createInterpretationJsonSchema(options.catalogue) } },
+    text: { format: { type: "json_schema", name: "game_search_interpretation", schema: createInterpretationJsonSchema() } },
   });
   if (new TextEncoder().encode(body).length > PROVIDER_CONFIG.maxRequestBytes) {
     throw new ProviderError("REQUEST_TOO_LARGE", 413, "The search request exceeds the live AI input limit.");

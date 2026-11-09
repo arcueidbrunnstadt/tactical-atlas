@@ -138,3 +138,79 @@ test("required management stays unresolved whether the provider broadens or drop
     }
   }
 });
+
+test("fragments and boundary punctuation coalesce into the exact mandatory conditional", () => {
+  for (const [scope, condition, consequence, separator, equipment] of [
+    ["If the setting is science fiction, I need to be able to get through the campaign with just one squad",
+      "If the setting is science fiction", "I need to be able to get through the campaign with just one squad", ". ",
+      "Equipment customization would be nice either way"],
+    ["如果是科幻题材，我必须能只靠一支小队打完战役", "如果是科幻题材", "我必须能只靠一支小队打完战役", "。",
+      "无论题材，有装备定制就更好了"],
+  ]) {
+    const query = `${scope}${separator}${equipment}`;
+    const criteria = [criterion("progression", "equipment", "eq", equipment, "preferred")];
+    for (const unhandledRequirements of [
+      [{ sourceText: condition, importance: "unknown" }, { sourceText: consequence, importance: "must" }],
+      [{ sourceText: scope + separator, importance: "preferred" }],
+      [{ sourceText: `${scope}${separator}${equipment.slice(0, 4)}`, importance: "must" }],
+      [{ sourceText: `${consequence}${separator}${equipment.slice(0, 4)}`, importance: "unknown" }],
+      [consequence, { sourceText: scope, importance: "must" }],
+    ]) {
+      const result = validateModelInterpretation({ ...ready, criteria, unhandledRequirements }, { ...context, query });
+
+      assert.equal(result.status, "ready");
+      assert.deepEqual(result.criteria.map(({ sourceText, importance }) => [sourceText, importance]), [[equipment, "preferred"]]);
+      assertOnlyUnresolved(result, query, scope);
+      assert.deepEqual(result.unhandledRequirements, [scope]);
+    }
+  }
+});
+
+test("scope coalescing keeps independent notes and wording that could refer outside the recognized clause", () => {
+  const scope = "I must be able to finish with just one squad";
+  const gear = "Equipment customization is a bonus";
+  const sideMissions = "I prefer just one squad in side missions";
+  const forecast = "I must see enemy intent before I move";
+  const query = `${scope}. ${forecast}. ${gear}. ${sideMissions}.`;
+  const partialOverlap = "finish with just one squad. I must see";
+  const repeated = "just one squad";
+  const independentNotes = [
+    { sourceText: partialOverlap, importance: "unknown" },
+    { sourceText: repeated, importance: "preferred" },
+    { sourceText: forecast, importance: "must" },
+  ];
+  const unhandledRequirements = [...independentNotes, { sourceText: "I must be able to finish", importance: "must" }];
+  const criteria = [criterion("progression", "equipment", "eq", gear, "preferred")];
+  const result = validateModelInterpretation({ ...ready, criteria, unhandledRequirements }, { ...context, query });
+
+  assert.deepEqual(result.criteria.map(({ sourceText }) => sourceText), [gear]);
+  assert.deepEqual(result.unresolvedRequirements.map(({ sourceText, importance }) => ({ sourceText, importance })),
+    [...independentNotes, { sourceText: scope, importance: "must" }]);
+  assert.deepEqual(result.unhandledRequirements, [...independentNotes.map(({ sourceText }) => sourceText), scope]);
+  assert.equal(new Set(result.unresolvedRequirements.map(({ id }) => id)).size, result.unresolvedRequirements.length);
+});
+
+test("group wording beyond a mandatory management clause stays only when an independent condition does not cover it", () => {
+  const scope = "If the setting is science fiction, I need to be able to get through the campaign with just one squad";
+  const otherBranch = "In other settings I don't mind a bigger roster";
+  const equipment = "Equipment customization would be nice either way";
+  const criteria = [criterion("progression", "equipment", "eq", equipment, "preferred")];
+  const options = [
+    { featureId: "setting", value: "scifi", operator: "neq" },
+    { featureId: "structure", value: "squad", operator: "eq" },
+  ];
+  for (const [query, groupQuote, expected] of [
+    [`${scope}. ${equipment}.`, `${scope}. `, scope],
+    [`${scope}. ${equipment}.`, `${scope}. ${equipment}.`, scope],
+    [`${scope}. ${otherBranch}. ${equipment}.`, `${scope}. ${otherBranch}.`, `${scope}. ${otherBranch}.`],
+  ]) {
+    const alternatives = [{ sourceText: groupQuote, options, importance: "must", weight: 1 }];
+    const result = validateModelInterpretation({ ...ready, criteria, alternatives }, { ...context, query });
+
+    assert.equal(result.status, "ready");
+    assert.deepEqual(result.alternatives, []);
+    assert.deepEqual(result.criteria.map(({ sourceText }) => sourceText), [equipment]);
+    assert.deepEqual(result.unhandledRequirements, [expected]);
+    assertOnlyUnresolved(result, query, expected);
+  }
+});

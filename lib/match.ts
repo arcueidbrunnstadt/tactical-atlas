@@ -222,7 +222,9 @@ function compareResults(a: MatchResult, b: MatchResult): number {
 export function matchGames(games: readonly GameRecord[], query: SearchQuery, locale: Locale = "en"): MatchGroups {
   const groups: MatchGroups = { matches: [], possible: [], excluded: [] };
   const conditions = uniqueConditions(query);
-  const excludedIdentities = new Set(query.excludedGameIds.map(normalizedIdentity));
+  const catalogueIds = new Set(games.map(({ id }) => id));
+  const exactExclusions = new Set(query.excludedGameIds.filter((id) => catalogueIds.has(id)));
+  const excludedIdentities = new Set(query.excludedGameIds.filter((id) => !catalogueIds.has(id)).map(normalizedIdentity));
   const seenIds = new Set<string>();
   const unresolved: UnresolvedRequirement[] = [...(query.unresolvedRequirements ?? [])];
   const representedText = new Set(unresolved.map((item) => item.sourceText));
@@ -238,7 +240,7 @@ export function matchGames(games: readonly GameRecord[], query: SearchQuery, loc
       throw new TypeError("Every catalogue game must have a unique nonblank ID.");
     }
     seenIds.add(game.id);
-    const explicitlyExcluded = [game.id, game.title, ...game.aliases]
+    const explicitlyExcluded = exactExclusions.has(game.id) || [game.id, game.title, ...game.aliases]
       .some((identity) => excludedIdentities.has(normalizedIdentity(identity)));
     if (explicitlyExcluded) {
       groups.excluded.push({

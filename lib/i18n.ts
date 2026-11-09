@@ -213,7 +213,7 @@ export const ZH_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
   "AI search is unavailable. Use the criteria below to keep exploring.": "AI 搜索暂时不可用，请使用下方条件继续探索。",
   "The search vocabulary changed. Reload and try again.": "搜索词汇已更新，请刷新后重试。",
   "Please shorten the search request.": "请缩短搜索描述。",
-  "The AI response could not be validated.": "AI 返回的结果未能通过校验，请手动调整条件。",
+  "The AI response could not be validated. You can edit the criteria below or try a new search.": "AI 返回的结果未能通过校验。你可以手动调整下方条件，或重新发起搜索。",
   "Please describe your request in the search form.": "请在搜索框中描述你的需求。",
   "This request was already submitted. Edit criteria manually, or make a new explicit search.": "这次请求已经提交过。你可以手动修改条件，或明确发起一次新搜索。",
   "This preview's per-visitor search allowance is temporarily used up. Please explore or edit criteria manually, then try later.": "本预览版中，你当前的搜索额度已暂时用完。可以先浏览或手动调整条件，稍后再试。",
@@ -361,7 +361,7 @@ export function searchErrorKey(code: unknown): string {
     case "TAXONOMY_MISMATCH": return "The search vocabulary changed. Reload and try again.";
     case "INVALID_REQUEST": return "Please describe your request in the search form.";
     case "INVALID_INTERPRETATION": case "INVALID_RESPONSE": case "INCOMPLETE_RESPONSE": case "MODEL_REFUSAL":
-      return "The AI response could not be validated.";
+      return "The AI response could not be validated. You can edit the criteria below or try a new search.";
     case "duplicate_request": return "This request was already submitted. Edit criteria manually, or make a new explicit search.";
     case "client_limit": return "This preview's per-visitor search allowance is temporarily used up. Please explore or edit criteria manually, then try later.";
     case "daily_limit": case "trial_exhausted": case "quota_unavailable":

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createInterpretationJsonSchema, QueryValidationError, validateModelInterpretation } from "../lib/query-schema.ts";
+import { createInterpretationJsonSchema, INTERPRETATION_VERSION, QueryValidationError, validateModelInterpretation } from "../lib/query-schema.ts";
 import { TAXONOMY_VERSION } from "../lib/taxonomy.ts";
 import { interpretRequest, type ProviderFetch } from "../server/provider.ts";
 
@@ -22,7 +22,7 @@ function unresolved(result: ReturnType<typeof validateModelInterpretation>) {
 }
 
 test("provider replies preserve explicit lower, approximate and upper comparisons in both languages", async () => {
-  const schema = createInterpretationJsonSchema(context.catalogue) as {
+  const schema = createInterpretationJsonSchema() as {
     properties: { criteria: { items: { properties: { operator: { enum: string[] } } } } };
   };
   assert.deepEqual(schema.properties.criteria.items.properties.operator.enum, ["eq", "neq", "gte", "near", "lte"]);
@@ -47,7 +47,7 @@ test("provider replies preserve explicit lower, approximate and upper comparison
 
     assert.equal(calls, 1);
     assert.equal(result.status, "ready", query);
-    assert.equal(result.interpretationVersion, "1.6");
+    assert.equal(result.interpretationVersion, INTERPRETATION_VERSION);
     assert.deepEqual(result.criteria, [{ ...criteria[0], id: `${context.requestId}:1` }]);
     assert.deepEqual(unresolved(result), []);
   }
