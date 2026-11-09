@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { validateModelInterpretation } from "../lib/query-schema.ts";
+import { QueryValidationError, validateModelInterpretation } from "../lib/query-schema.ts";
+import { originalQuote } from "../lib/interpretation-grounding.ts";
 import { TAXONOMY_VERSION } from "../lib/taxonomy.ts";
 
 const context = {
@@ -62,6 +63,39 @@ test("both an either-or proxy and flattened filters leave a scoped conditional r
       assert.deepEqual(result.criteria.map(({ featureId, sourceText, importance }) => [featureId, sourceText, importance]), [["progression", equipment, "preferred"]]);
       assertOnlyUnresolved(result, query, clause);
     }
+  }
+});
+
+test("quote recovery is exact or uniquely equivalent in presentation", () => {
+  const query = "我想要科幻题材，装备定制更好";
+  assert.equal(originalQuote(query, '「科幻题材,装备定制更好」'), "科幻题材，装备定制更好");
+  assert.equal(originalQuote(`${query}。${query}`, "科幻题材,装备定制更好"), undefined);
+  assert.equal(originalQuote(query, "科幻题材,装备定制不好"), undefined);
+  assert.equal(originalQuote("上限50小时", "上限５0小时"), undefined);
+  assert.equal(originalQuote("A. B", "A。 B"), undefined);
+});
+
+test("a paraphrased equipment criterion recovers only a uniquely stated positive preference", () => {
+  const hard = "如果是科幻题材，我必须能只靠一支小队打完战役";
+  const preference = "无论题材，有装备定制就更好了";
+  const gear = criterion("progression", "equipment", "eq", "装备自定义是加分项", "preferred");
+  const reply = { ...ready, criteria: [gear] };
+  const query = `${hard}。${preference}。`;
+  const result = validateModelInterpretation(reply, { ...context, query });
+  assert.deepEqual(result.criteria.map(({ sourceText, importance }) => [sourceText, importance]), [[preference, "preferred"]]);
+  assertOnlyUnresolved(result, query, hard);
+
+  const invalidQuote = (error: unknown) => error instanceof QueryValidationError && error.validationReason === "criterion_quote";
+  for (const other of [
+    `${hard}。不想要装备定制。`,
+    `${hard}。如果是奇幻，装备定制更好。`,
+    `${hard}。我必须要装备定制。`,
+    `${hard}。${preference}。${preference}。`,
+  ]) {
+    assert.throws(() => validateModelInterpretation(reply, { ...context, query: other }), invalidQuote);
+  }
+  for (const wrong of [{ ...gear, importance: "must" }, { ...gear, operator: "neq" }, { ...gear, weight: 3 }]) {
+    assert.throws(() => validateModelInterpretation({ ...ready, criteria: [wrong] }, { ...context, query }), invalidQuote);
   }
 });
 

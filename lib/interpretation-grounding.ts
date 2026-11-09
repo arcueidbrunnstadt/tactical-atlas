@@ -11,6 +11,35 @@ export function hasDirectMechanicCue(featureId: string, quote: string): boolean 
   return !pattern || pattern.test(quote.normalize("NFKC"));
 }
 
+const punctuationWidth: Readonly<Record<string, string>> = {
+  "，": ",", "；": ";", "！": "!", "？": "?", "：": ":",
+};
+const closingQuote: Readonly<Record<string, string>> = { '"': '"', "“": "”", "「": "」", "『": "』" };
+
+/** Rebind presentation-only changes to a unique span in the original request. */
+export function originalQuote(query: string, supplied: string): string | undefined {
+  if (query.includes(supplied)) return supplied;
+  const trimmed = supplied.trim();
+  const quote = trimmed.length > 1 && closingQuote[trimmed[0]] === trimmed.at(-1)
+    ? trimmed.slice(1, -1).trim() : trimmed;
+  if (!quote) return;
+  const narrow = (text: string) => text.replace(/[，；！？：]/gu, (character) => punctuationWidth[character]);
+  const request = narrow(query);
+  const normalizedQuote = narrow(quote);
+  const start = request.indexOf(normalizedQuote);
+  if (start >= 0 && request.indexOf(normalizedQuote, start + 1) < 0) return query.slice(start, start + quote.length);
+}
+
+// This is independent evidence for a positive preference. A topic mention,
+// conditional, negated statement or mandatory request does not qualify.
+const equipmentPreference = /^(?:I(?:['’]d| would)? prefer (?:equipment customization|to customize (?:my )?equipment)|equipment customization (?:would be nice(?: either way)?|would be a bonus)|(?:(?:无论|無論|不论|不論|不管)(?:什么|什麼|哪种|哪種)?(?:题材|題材)[,，]\s*)?有?(?:装备|裝備)(?:定制|订制|訂製|自定义|自定義|客製化)(?:功能)?就?(?:更好了?|会更好|會更好|是加分[项項]))$/iu;
+
+export function explicitEquipmentPreference(query: string): string | undefined {
+  const clauses = query.split(/[.!?;。！？；\r\n]+/u).map((clause) => clause.trim());
+  const matches = clauses.filter((clause) => equipmentPreference.test(clause));
+  return matches.length === 1 ? matches[0] : undefined;
+}
+
 // Structure records management types. They do not establish whether a role can
 // be avoided, must be performed, or suffices for a whole campaign.
 const managementRole = /\b(?:compan(?:y|ies)|rosters?|squads?|fireteams?|parties|party)\b|佣兵[团團]|兵[团團]|小[队隊]|分[队隊]|[队隊]伍|[阵陣]容|名[册冊]/iu;

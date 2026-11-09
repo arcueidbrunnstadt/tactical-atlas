@@ -1,5 +1,5 @@
 import { CAMPAIGN_HOURS_FEATURE, CAMPAIGN_HOUR_TARGET, getAlternativeOptionKey, isAllowedOperator, isAllowedValue, MAX_ALTERNATIVE_GROUPS, MAX_ALTERNATIVE_OPTIONS, MIN_ALTERNATIVE_OPTIONS, TAXONOMY, TAXONOMY_VERSION } from "./taxonomy.ts";
-import { hasDirectMechanicCue, managementScopeClauses, overlappingQuoteOffset, quoteIsWithin } from "./interpretation-grounding.ts";
+import { explicitEquipmentPreference, hasDirectMechanicCue, managementScopeClauses, originalQuote, overlappingQuoteOffset, quoteIsWithin } from "./interpretation-grounding.ts";
 import { NUMERIC_COMPARISONS } from "./numeric-comparison.ts";
 import { quotesWholeHourTarget, readQuotedHourComparison } from "./quoted-comparison.ts";
 import { resolveTitleExclusions } from "./title-exclusions.ts";
@@ -135,9 +135,13 @@ export function validateModelInterpretation(
         || (candidate.importance !== "must" && candidate.importance !== "preferred")
         || (candidate.weight !== 1 && candidate.weight !== 3)
         || !boundedText(candidate.sourceText, MAX_QUERY_CHARACTERS)) return invalid("criterion_shape");
-    if (!context.query.includes(candidate.sourceText)) return invalid("criterion_quote");
+    const equipmentPreference = candidate.featureId === "progression" && candidate.value === "equipment"
+      && candidate.operator === "eq" && candidate.importance === "preferred" && candidate.weight === 1;
+    const sourceText = originalQuote(context.query, candidate.sourceText)
+      ?? (equipmentPreference ? explicitEquipmentPreference(context.query) : undefined);
+    if (!sourceText) return invalid("criterion_quote");
     if (candidate.featureId === CAMPAIGN_HOURS_FEATURE
-        && (typeof candidate.value !== "number" || !quotesWholeHourTarget(candidate.sourceText, candidate.value))) return invalid("numeric_quote");
+        && (typeof candidate.value !== "number" || !quotesWholeHourTarget(sourceText, candidate.value))) return invalid("numeric_quote");
     criteria.push({
       id: `${context.requestId}:${index + 1}`,
       featureId: candidate.featureId,
@@ -145,7 +149,7 @@ export function validateModelInterpretation(
       operator: candidate.operator,
       importance: candidate.importance,
       weight: candidate.weight,
-      sourceText: candidate.sourceText,
+      sourceText,
     });
   }
   const rawAlternatives = Object.hasOwn(value, "alternatives") ? value.alternatives : [];
@@ -156,9 +160,10 @@ export function validateModelInterpretation(
         || (group.importance !== "must" && group.importance !== "preferred")
         || (group.weight !== 1 && group.weight !== 3)
         || !boundedText(group.sourceText, MAX_QUERY_CHARACTERS)
-        || criteria.some(({ sourceText }) => sourceText === group.sourceText)
         || !Array.isArray(group.options) || group.options.length < MIN_ALTERNATIVE_OPTIONS || group.options.length > MAX_ALTERNATIVE_OPTIONS) return invalid("alternative_group");
-    if (!context.query.includes(group.sourceText)) return invalid("alternative_quote");
+    const sourceText = originalQuote(context.query, group.sourceText);
+    if (!sourceText) return invalid("alternative_quote");
+    if (criteria.some((criterion) => criterion.sourceText === sourceText)) return invalid("alternative_group");
 
     const options: AlternativeOption[] = [];
     for (const option of group.options) {
@@ -172,7 +177,7 @@ export function validateModelInterpretation(
       options.push(validated);
     }
     alternatives.push({
-      id: `${context.requestId}:alternatives:${index + 1}`, sourceText: group.sourceText,
+      id: `${context.requestId}:alternatives:${index + 1}`, sourceText,
       options, importance: group.importance, weight: group.weight,
     });
   }
@@ -222,8 +227,9 @@ export function validateModelInterpretation(
       importance = "unknown";
     } else if (record(item) && exactKeys(item, unresolvedKeys)
         && boundedText(item.sourceText, MAX_QUERY_CHARACTERS) && isUnresolvedPriority(item.importance)) {
-      if (!context.query.includes(item.sourceText)) return invalid("unresolved_quote");
-      sourceText = item.sourceText;
+      const quote = originalQuote(context.query, item.sourceText);
+      if (!quote) return invalid("unresolved_quote");
+      sourceText = quote;
       importance = item.importance;
     } else {
       return invalid("unresolved_shape");
